@@ -10,7 +10,7 @@
 
 #-----------------Loading packages-------------------
 
-pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel")
+pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme")
 nip <- pkgs[!(pkgs %in% installed.packages())]
 nip <- lapply(nip, install.packages, dependencies = TRUE)
 ip   <- unlist(lapply(pkgs, require, character.only = TRUE, quietly = TRUE))
@@ -32,7 +32,8 @@ sapply(files.source, source)
 
 #----------------Run code------------------------
 
-growth_data_prep = data_prep(growth_data)
+growth_data_prep = data_prep(growth_data) %>%
+  na.omit()
 
 #Testing model performances at predicting growth rates K based on mean adjusted R squared over 100 iterations
 fam_perf = K_fam_perf(growth_data_prep)
@@ -40,5 +41,7 @@ fam_diet_perf = K_fam_diet_perf(growth_data_prep)
 gen_perf = K_gen_perf(growth_data_prep)
 gen_diet_perf = K_gen_diet_perf(growth_data_prep)
 
-test
-
+#Testing Linf predictions model performance
+Linf_fam_perf = Linf_fam_perf(growth_data_prep)
+Linf_fam_diet = Linf_fam_diet_perf(growth_data_prep)
+Linf_gen_perf = Linf_gen_perf(growth_data_prep)
