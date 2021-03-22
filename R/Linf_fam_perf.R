@@ -9,7 +9,6 @@
 #' 
 #' 
 
-growth_data = growth_data_prep
 Linf_fam_perf <- function(growth_data){
   
   #Multiple cross validation procedures to get mean R squared model
@@ -18,16 +17,17 @@ Linf_fam_perf <- function(growth_data){
     #Split data into 80% and 20% for crossvalidation 
     
     growth_data_split <- growth_data %>% 
-      initial_split(prop=0.8)
+      initial_split(prop=0.8,strata="Family")
     
     growth_data_train <-  training(growth_data_split)
     growth_data_test <- testing(growth_data_split)
     
     #NLME model to predict Tinf at family level
     Growth_fam <-  groupedData(K~MaxSize|Family, data= growth_data_train)
-    
-    Growth_fam_model <-  nlme(Linf~MaxSize.fct(a,MaxSize),
-                              data=Growth_fam,fixed=a~1,random=a~1,start=list(fixed=c(0.5)))
+
+    tryCatch(Growth_fam_model <-  nlme(Linf~MaxSize.fct(a,MaxSize),
+                                  data=Growth_fam,fixed=a~1,random=a~1,start=list(fixed=c(0.5)))
+             ,error = function(e) cat("Error, model didn't converge"))
     
     #Cleaning model parameters
     Growth_fam_model_clean <- broom.mixed::tidy(Growth_fam_model,effects="ran_coefs") %>%
@@ -40,7 +40,7 @@ Linf_fam_perf <- function(growth_data){
       mutate(Linf_predict = a_pred*MaxSize)
     
     #Performance of family/diet model
-    fam_perf <- summary(lm(Linf~Linf_predict,Growth_fam_model_clean))$adj.r.squared
+    (fam_perf <- summary(lm(Linf~Linf_predict,Growth_fam_model_clean))$adj.r.squared)
     
     p <- list(data.frame(loop = p,
                          rsquared = fam_perf))

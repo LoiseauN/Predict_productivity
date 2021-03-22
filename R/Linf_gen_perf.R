@@ -25,8 +25,9 @@ Linf_gen_perf <- function(growth_data){
     #NLME model to predict Tinf at family level
     Growth_gen = groupedData(K~MaxSize|Genus, data=growth_data_train)
     
-    Growth_gen_model <-  nlme(Linf~MaxSize.fct(a,MaxSize),
+    tryCatch(Growth_gen_model <-  nlme(Linf~MaxSize.fct(a,MaxSize),
                               data=Growth_gen,fixed=a~1,random=a~1,start=list(fixed=c(0.5)))
+             ,error = function(e) cat("Error, model didn't converge"))
     
     #Cleaning model parameters
     Growth_gen_model_clean <- broom.mixed::tidy(Growth_gen_model,effects="ran_coefs") %>%

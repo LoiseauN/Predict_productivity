@@ -9,6 +9,7 @@
 #' 
 #' 
 
+growth_data = growth_data_prep
 Linf_fam_diet_perf <- function(growth_data){
   
   #Multiple cross validation procedures to get mean R squared model
@@ -25,8 +26,9 @@ Linf_fam_diet_perf <- function(growth_data){
     #NLME model to predict Tinf at family level
     Growth_fam_diet= groupedData(K~MaxSize|Family/Diet, data=growth_data_train)
     
-    Growth_fam_diet_model <-  nlme(Linf~MaxSize.fct(a,MaxSize),
+    tryCatch(Growth_fam_diet_model <-  nlme(Linf~MaxSize.fct(a,MaxSize),
                               data=Growth_fam_diet,fixed=a~1,random=a~1,start=list(fixed=c(0.5)))
+             ,error = function(e) cat("Error, model didn't converge"))
     
     #Cleaning model parameters
     Growth_fam_diet_model_clean <- broom.mixed::tidy(Growth_fam_diet_model,effects="ran_coefs") %>%

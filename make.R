@@ -42,6 +42,7 @@ gen_perf = K_gen_perf(growth_data_prep)
 gen_diet_perf = K_gen_diet_perf(growth_data_prep)
 
 #Testing Linf predictions model performance
-Linf_fam_perf = Linf_fam_perf(growth_data_prep)
+#ICI PROBLEME, PAS ASSEZ DE DONNEES POUR CONVERGER
+Linf_fam_perf =   Linf_fam_perf(growth_data_prep)
 Linf_fam_diet = Linf_fam_diet_perf(growth_data_prep)
 Linf_gen_perf = Linf_gen_perf(growth_data_prep)
