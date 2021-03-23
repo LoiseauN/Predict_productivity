@@ -10,7 +10,7 @@
 
 #-----------------Loading packages-------------------
 
-pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme")
+pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","harrypotter","wesanderson","dichromat")
 nip <- pkgs[!(pkgs %in% installed.packages())]
 nip <- lapply(nip, install.packages, dependencies = TRUE)
 ip   <- unlist(lapply(pkgs, require, character.only = TRUE, quietly = TRUE))
@@ -32,14 +32,26 @@ sapply(files.source, source)
 
 #----------------Run code------------------------
 
+setwd(here())
+
 growth_data_prep = data_prep(growth_data) %>%
-  na.omit()
+  na.omit()%>%
+  filter(Family !="Apogonidae") %>%
+  filter(!(Family == "Gobiidae" & K == 2.482)) %>%
+  filter(!(Family == "Pomacentridae" & K == 4)) %>%
+  filter(!(Species == "Salarias patzneri"))
 
 #Testing model performances at predicting growth rates K based on mean adjusted R squared over 100 iterations
 fam_perf = K_fam_perf(growth_data_prep)
 fam_diet_perf = K_fam_diet_perf(growth_data_prep)
 gen_perf = K_gen_perf(growth_data_prep)
 gen_diet_perf = K_gen_diet_perf(growth_data_prep)
+
+#We keep models without diet because they don't improve the model
+
+#Getting some plots
+plot_fam_perf(growth_data_prep)
+plot_gen_perf(growth_data_prep)
 
 #Testing Linf predictions model performance
 #ICI PROBLEME, PAS ASSEZ DE DONNEES POUR CONVERGER

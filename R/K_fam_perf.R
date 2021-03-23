@@ -17,7 +17,7 @@ K_fam_perf <- function(growth_data){
   #Split data into 80% and 20% for crossvalidation 
   
   growth_data_split = growth_data %>% 
-    initial_split(prop=0.8,strata = "Family")
+    initial_split(prop=0.8)
   
   growth_data_train = training(growth_data_split)
   growth_data_test = testing(growth_data_split)
@@ -44,9 +44,8 @@ K_fam_perf <- function(growth_data){
     mutate(K_pred = exp(Intercept) * Mmax**(SlopeLogMmax)*exp(SlopeInvTkb/(8.62e-05*sstmean)))
   
   #Peformance of family model
-  fam_perf <- summary(lm(K~K_pred,fam_model_clean))$adj.r.squared
+  (fam_perf <- summary(lm(K~K_pred,fam_model_clean))$adj.r.squared)
   
-
   #---------------GETTING MODEL PERFORMANCEs-----------------------------------
   
   p <- list(data.frame(loop = p,

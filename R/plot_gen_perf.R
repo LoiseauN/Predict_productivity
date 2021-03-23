@@ -9,7 +9,7 @@
 #' 
 #' 
 
-K_gen_perf <- function(growth_data){
+plot_gen_perf <- function(growth_data){
   
   #Multiple cross validation procedures to get mean R squared model
   test <-  mclapply(1:100,function(p){
@@ -43,33 +43,47 @@ K_gen_perf <- function(growth_data){
       #Predicting K using MTE
       mutate(K_pred = exp(Intercept) * Mmax**(SlopeLogMmax)*exp(SlopeInvTkb/(8.62e-05*sstmean)))
     
-    #Performance of genus model
-    gen_perf <- summary(lm(K~K_pred,gen_model_clean))$adj.r.squared
+    #Model parameters with genus
+    
+    model = lm(K~K_pred,gen_model_clean)
     
     by_genus  = group_by(gen_model_clean,Genus)
-    
-    test = do(by_genus,augment(lm(K~K_pred,data=.))) %>%
+  
+    model_augment = do(by_genus,augment(lm(K~K_pred,data=.))) %>%
       mutate(diff = abs(K - K_pred))
-    
-    ggplot(test, aes(reorder(Genus,-diff),diff,color=Genus))+
-      geom_boxplot()+
-      guides(color=FALSE)+
-      theme_bw()+
-      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-    
-    ggplot(test, aes(.fitted, .resid)) +
-      geom_point(aes(group=Family,color=Family),alpha= 1/3)+
-      geom_smooth()
-    
     
     #---------------GETTING MODEL PERFORMANCEs-----------------------------------
     
-    p <- list(data.frame(loop = p,
-                         rsquared = gen_perf))
+    p <- list(data.frame(model_augment))
+    
     
   })
   
-  genus_perf <- do.call(rbind,do.call(rbind,test)) %>%
-    summarize(rsquared = mean(rsquared))
+  
+  gen_perf <- do.call(rbind,do.call(rbind,test))
+  
+  ggplot(gen_perf, aes(reorder(Genus,-diff),diff,fill=Genus))+
+    geom_boxplot()+
+    geom_jitter(alpha = 1/8,size=0.1)+
+    scale_fill_viridis_d()+
+    guides(fill=FALSE)+
+    theme_bw()+
+    theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+    labs(y="Difference between observed growth rates and predicted growth rates",
+         x="")
+  
+  ggsave("figures/difgen.pdf",height =11,width = 13)
+  ggsave("figures/difgen.png",height =11,width = 13)
+  
+  ggplot(gen_perf, aes(.fitted, .resid)) +
+    geom_line(aes(group=Genus,color=Genus),alpha= 1/3)+
+    guides(color=FALSE)+
+    geom_smooth(se=F,color="black")+
+    theme_bw()+
+    labs(x="Fitted values",
+         y="Residuals")
+  
+  ggsave("figures/resgen.pdf",height=11,width = 13)
+  ggsave("figures/resgen.png",height=11,width = 13)
   
 }

@@ -8,7 +8,7 @@
 #' @export
 #' 
 #' 
-
+growth_data = growth_data_prep
 K_fam_diet_perf <- function(growth_data){
   
   #Multiple cross validation procedures to get mean R squared model
@@ -45,8 +45,9 @@ K_fam_diet_perf <- function(growth_data){
       mutate(K_pred = exp(Intercept) * Mmax**(SlopeLogMmax)*exp(SlopeInvTkb/(8.62e-05*sstmean)))
     
     #Performance of family/diet model
-    fam_diet_perf <- summary(lm(K~K_pred,fam_diet_model_clean))$adj.r.squared
+    (fam_diet_perf <- summary(lm(K~K_pred,fam_diet_model_clean))$adj.r.squared)
     
+
     #---------------GETTING MODEL PERFORMANCEs-----------------------------------
     
     p <- list(data.frame(loop = p,
