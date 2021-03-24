@@ -42,6 +42,7 @@ growth_data_prep = data_prep(growth_data) %>%
   dplyr::mutate(Species = stringr::str_replace(Species, " ", "_"))
 
 data_prod = data_prod %>%
+  dplyr::rename(Size="Taille")%>%
   mutate(sst = sst+273.5)
 
 #Testing model performances at predicting growth rates K based on mean adjusted R squared over 100 iterations
@@ -70,10 +71,18 @@ fam_model_Linf = save_fam_model_Linf(growth_Linf)
 gen_model_Linf = save_gen_model_Linf(growth_Linf)
 fish_model_Linf = save_fish_model_Linf(growth_Linf)
 
-#Predicting K 
+#Predicting K and Linf
 data_merged = merge_growth(growth_data_prep,data_prod,gen_model_K)
 data_K = predict_K(data_merged,gen_model_K,fam_model_K,fish_model_K)
 data_final = predict_Linf(data_K,fam_model_Linf,gen_model_Linf,fish_model_Linf)
 
-#Predicting Linf
+data_final = data_final %>%
+  dplyr::rename(Size = "Taille")
+
+#Calculating productivity
+NC_prod = calc_prod(data_final,500)
+
+#Pooling by transect
+NC_transect = prod_pool(NC_prod)
+
 
