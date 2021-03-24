@@ -9,7 +9,7 @@
 #' 
 #' 
 
-growth_data = growth_data_prep
+
 Linf_fam_diet_perf <- function(growth_data){
   
   #Multiple cross validation procedures to get mean R squared model

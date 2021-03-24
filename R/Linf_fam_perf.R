@@ -5,7 +5,6 @@
 #' @param growth_data the output from the data_prep function 
 #' 
 #' @return dataframe with performance of each model
-#' @export
 #' 
 #' 
 
@@ -17,7 +16,7 @@ Linf_fam_perf <- function(growth_data){
     #Split data into 80% and 20% for crossvalidation 
     
     growth_data_split <- growth_data %>% 
-      initial_split(prop=0.8,strata="Family")
+      initial_split(prop=0.8)
     
     growth_data_train <-  training(growth_data_split)
     growth_data_test <- testing(growth_data_split)

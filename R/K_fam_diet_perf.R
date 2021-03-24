@@ -7,8 +7,8 @@
 #' @return dataframe with performance of each model
 #' @export
 #' 
-#' 
-growth_data = growth_data_prep
+
+
 K_fam_diet_perf <- function(growth_data){
   
   #Multiple cross validation procedures to get mean R squared model

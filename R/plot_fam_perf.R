@@ -9,8 +9,6 @@
 #' 
 #' 
 
-
-growth_data = growth_data_prep
 plot_fam_perf <- function(growth_data){
   
   #Multiple cross validation procedures to get mean R squared model
