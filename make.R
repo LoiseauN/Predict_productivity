@@ -10,7 +10,8 @@
 
 #-----------------Loading packages-------------------
 
-pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","harrypotter","wesanderson","dichromat")
+pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme",
+          "harrypotter","wesanderson","dichromat","ranger","ggpubr")
 nip <- pkgs[!(pkgs %in% installed.packages())]
 nip <- lapply(nip, install.packages, dependencies = TRUE)
 ip   <- unlist(lapply(pkgs, require, character.only = TRUE, quietly = TRUE))
@@ -76,13 +77,18 @@ data_merged = merge_growth(growth_data_prep,data_prod,gen_model_K)
 data_K = predict_K(data_merged,gen_model_K,fam_model_K,fish_model_K)
 data_final = predict_Linf(data_K,fam_model_Linf,gen_model_Linf,fish_model_Linf)
 
-data_final = data_final %>%
-  dplyr::rename(Size = "Taille")
-
 #Calculating productivity
 NC_prod = calc_prod(data_final,500)
 
 #Pooling by transect
 NC_transect = prod_pool(NC_prod)
 
+#Protection classes
+NC_management = data_management(NC_transect)
+NC_covariates = data_covariates(NC_management)
 
+#Modelling
+model_test = test_model(NC_covariates)
+
+#Plotting some stuff
+var_imp = plot_var_imp()

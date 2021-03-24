@@ -15,7 +15,9 @@ prod_pool <- function(prod_data){
     group_by(ID_transect)%>%
     mutate(Prod=sum(Prod),
            Biom=sum(Biom),
+           ProdB = Prod/Biom,
            logProd = log(Prod+1),
-           logBiom = log(Biom+1))%>%
+           logBiom = log(Biom+1),
+           logProdB = log(ProdB+1))%>%
     distinct()
 }
