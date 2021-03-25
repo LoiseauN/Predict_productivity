@@ -10,7 +10,7 @@
 data_covariates <- function(data_prod){
   
   covariates = data_prod %>%
-    select(-c(Biom,Prod:logProdB,Latitude,travel_time,Longitude,mpa_pres,coral_surf,coralpres))%>%
+    dplyr::select(-c(Biom,Prod:logProdB,Latitude,sst,travel_time,Longitude,mpa_pres,coral_surf,coralpres))%>%
     na.omit()%>%
     rownames_to_column('ID_transect') %>%
     dplyr::mutate(depth = arm::rescale(log(abs(depth)+1)),

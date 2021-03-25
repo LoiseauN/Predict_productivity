@@ -34,6 +34,7 @@ for (i in 1:nrow(data_prod)){
   }
 }
   
+  save(data_prod,file="outputs/data_final.RData")
   return(data_prod)
   
 }

@@ -10,8 +10,8 @@
 
 #-----------------Loading packages-------------------
 
-pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme",
-          "harrypotter","wesanderson","dichromat","ranger","ggpubr")
+pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot",
+          "harrypotter","wesanderson","dichromat","ranger","ggpubr","data.table","pdp","png")
 nip <- pkgs[!(pkgs %in% installed.packages())]
 nip <- lapply(nip, install.packages, dependencies = TRUE)
 ip   <- unlist(lapply(pkgs, require, character.only = TRUE, quietly = TRUE))
@@ -83,6 +83,9 @@ NC_prod = calc_prod(data_final,500)
 #Pooling by transect
 NC_transect = prod_pool(NC_prod)
 
+#Plot K by size
+K_by_size(NC_prod)
+
 #Protection classes
 NC_management = data_management(NC_transect)
 NC_covariates = data_covariates(NC_management)
@@ -91,4 +94,8 @@ NC_covariates = data_covariates(NC_management)
 model_test = test_model(NC_covariates)
 
 #Plotting some stuff
-var_imp = plot_var_imp()
+var_imp = plot_var_imp(model_test)
+
+#Getting plot probabilities
+model_prob(NC_covariates)
+
