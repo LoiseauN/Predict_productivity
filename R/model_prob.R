@@ -12,8 +12,7 @@ model_prob = function(prod_data){
   
   #Full model and delete transition data
   mod = ranger(Class~.,data=prod_data,mtry=3,probability = T,num.trees=1000)
-  
-  
+
   
   #getting model probabilities
   pd_travel <- NULL
@@ -164,6 +163,6 @@ model_prob = function(prod_data){
   
   ggarrange(img,plots,widths=c(1,2))
   
-  ggsave("Figures/proba_vars.pdf",height=15,width=20)
-  ggsave("Figures/proba_vars.png",height=15,width=20)
+  ggsave("Figures/proba_vars.pdf",height=11,width=17)
+  ggsave("Figures/proba_vars.png",height=11,width=17)
 }
