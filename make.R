@@ -42,14 +42,9 @@ nc_map = st_read("shp/NewCaledonia_v7.shp")
 
 setwd(here())
 
-growth_data_prep = data_prep(growth_data) %>%
-  na.omit()%>%
-  filter(Family !="Apogonidae") %>%
-  filter(!(Family == "Gobiidae" & K == 2.482)) %>%
-  filter(!(Family == "Pomacentridae" & K == 4)) %>%
-  filter(!(Species == "Salarias patzneri"))%>%
-  dplyr::mutate(Species = stringr::str_replace(Species, " ", "_"))
+growth_data_prep = data_prep(growth_data)
 
+#converting temperature from sst to kelvin
 data_prod = data_prod %>%
   mutate(sst = sst+273.5)
 
