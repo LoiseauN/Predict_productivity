@@ -10,6 +10,7 @@
 #' 
 #' 
 
+
 data_prep <- function(data){
 
   data_prepped = data %>%
@@ -34,6 +35,5 @@ data_prep <- function(data){
     dplyr::mutate(Species = stringr::str_replace(Species, " ", "_"))
   
   return(data_prepped)
-  
 
 }

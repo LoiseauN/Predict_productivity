@@ -7,7 +7,9 @@
 #' @export
 #' 
 
+prod_data = RLS_Covariates
 test_model <- function(prod_data){
+  
 ranger_loop = mclapply(1:100,function(i){
   
   data_split <- initial_split(prod_data, prop = 0.8)
@@ -28,7 +30,7 @@ ranger_loop = mclapply(1:100,function(i){
                       data.frame(Balanced_Accuracy = CM$byClass[,11]))
   return(model_varImp)
   
-})
+},mc.cores = 3)
 
 #Getting variable importance from output list
 rel_inf = ranger_loop %>%
@@ -41,7 +43,8 @@ rel_inf = ranger_loop %>%
   na.omit()%>%
   #Getting mean variable importance over all iterations
   dplyr::group_by(rowname)%>%
-  dplyr::summarize(importance.mod.=mean(importance.mod.))
+  dplyr::summarize(importance.mod.=mean(importance.mod.))%>%
+  mutate(percentage = (importance.mod.*100)/sum(importance.mod.))
 
 #Getting model performance from output list
 preds = ranger_loop %>%
@@ -74,7 +77,11 @@ output = list(data.frame(rel_inf),
               data.frame(preds),
               data.frame(preds_class))
 
+beep(sound=4)
+
 return(output)
+
+
 
 
 }

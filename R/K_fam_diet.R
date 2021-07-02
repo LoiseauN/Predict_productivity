@@ -8,7 +8,6 @@
 #' @export
 #' 
 
-
 K_fam_diet_perf <- function(growth_data){
   
   #Multiple cross validation procedures to get mean R squared model
@@ -46,7 +45,7 @@ K_fam_diet_perf <- function(growth_data){
     
     #Performance of family/diet model
     (fam_diet_perf <- summary(lm(K~K_pred,fam_diet_model_clean))$adj.r.squared)
-    
+  
 
     #---------------GETTING MODEL PERFORMANCEs-----------------------------------
     

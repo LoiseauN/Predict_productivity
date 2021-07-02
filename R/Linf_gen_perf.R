@@ -47,8 +47,8 @@ Linf_gen_perf <- function(growth_data){
     
   })
   
-  family_perf <- do.call(rbind,do.call(rbind,test)) %>%
-    summarize(rsquared = mean(rsquared))
+  family_perf <- do.call(rbind,do.call(rbind,test))
+  family_perf <- summarize(family_perf,rsquared = mean(rsquared))
   
 }
 
