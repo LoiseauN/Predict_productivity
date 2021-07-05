@@ -10,7 +10,7 @@
 data_covariates <- function(data_prod){
   
   covariates = data_prod %>%
-    dplyr::select(-c(log10Biom,log10ProdB,SurveyID,SiteLatitude,SiteLongitude,Country))%>%
+    dplyr::select(-c(log10Biom,log10ProdB,SurveyID,SiteLatitude,SiteLongitude,Country)) %>%
     mutate(Class = as.factor(Class))
   
   return(covariates)

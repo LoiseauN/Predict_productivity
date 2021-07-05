@@ -111,5 +111,4 @@ K_by_size = function(data_prod){
   ggsave("Figures/K_by_size_details.png",height = 210,width=297,units="mm")
   ggsave("Figures/K_by_size_details.pdf",height = 210,width=297,units="mm")
   
-  
 }
