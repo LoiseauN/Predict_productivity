@@ -7,7 +7,7 @@
 #' @export
 #' 
 
-model_test[[1]]
+
 plot_var_imp <- function(model_test_output){
   
   #Getting variable importance from output list

@@ -6,21 +6,21 @@
 #' @export
 #' 
 
-calc_prod <- function(data_prod,area){
+calc_prod <- function(data_prod){
   
   #Size corrections
   data_forprod = data_prod %>%
     #If observed size is higher than the maximum reported size, then replace observed size with maximum size
-    mutate(Size = ifelse(Size>SizeMax,SizeMax,Size))%>%
+    mutate(Sizeclass = ifelse(Sizeclass>MaxLength,MaxLength,Sizeclass))%>%
     #If observed size is higher than Linf, then we replace Linf with maximum size
-    mutate(Linf = ifelse(Size>Linf_pred,SizeMax,Linf_pred))
+    mutate(Linf = ifelse(Sizeclass>Linf_pred,MaxLength,Linf_pred))
   
   data_with_prod = data_forprod %>%
     #Calculating production
     #Weight of fish at time of census
-    mutate(W = lwa*Size^lwb,
+    mutate(W = lwa*Sizeclass^lwb,
            #Age of fish at time of census
-           t = (1/K_pred)*log((SizeMax)/((1-(Size/SizeMax))*SizeMax)),
+           t = (1/K_pred)*log((MaxLength)/((1-(Sizeclass/MaxLength))*MaxLength)),
            #Projected size one year later
            Ltx = Linf * (1-exp(-K_pred*(t+365))),
            #Projected weight one year later
@@ -28,13 +28,13 @@ calc_prod <- function(data_prod,area){
            #Production 
            Wgain = Wtx - W,
            #Biomass
-           Biom = (W*nb_corr)/area,
+           Biom = (W*Num)/Area,
            #Individual Biomass 
-           IndBiom = (W/area),
+           IndBiom = (W/Area),
            #Production
-           Prod = (Wgain * nb_corr)/area,
+           Prod = (Wgain * Num)/Area,
            #Individual production 
-           IndProd = (Wgain/area)) %>%
+           IndProd = (Wgain/Area)) %>%
     filter(!is.na(Prod))
   
   return(data_with_prod)

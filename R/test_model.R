@@ -7,12 +7,18 @@
 #' @export
 #' 
 
-prod_data = RLS_Covariates
+
 test_model <- function(prod_data){
   
+  #Selecting covariables of interest
+  data_formodel = prod_data %>%
+    dplyr::select(Depth:Effectiveness,Class)%>%
+    na.omit()
+
+#Running random foret a 100 times
 ranger_loop = mclapply(1:100,function(i){
   
-  data_split <- initial_split(prod_data, prop = 0.8)
+  data_split <- initial_split(data_formodel, prop = 0.8)
   
   train <- training(data_split)
   test <- testing(data_split)

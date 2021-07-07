@@ -36,38 +36,8 @@ nc_map = st_read("shp/NewCaledonia_v7.shp")
 
 setwd(here())
 
-test = fish %>% filter(Num == 4500)
-boxplot(data_forproduction$Biomass)
-
-RLS_temp = data_prod_brut %>%
-  dplyr::select(SurveyID,Biom,Prod,Productivity,log10Prod)
-
-RLSwithprod = RLS_Management %>%
-  left_join(RLS_temp, by = "SurveyID")
-
-
-max(data_forproduction$K_pred,na.rm=T)
-min(data_forproduction$K_pred,na.rm=T)
-
-min(RLSwithprod$Biom)
-max(RLSwithprod$Biom)
-
-min(RLSwithprod$Prod)
-max(RLSwithprod$Prod)
-
-min(RLSwithprod$Productivity)
-max(RLSwithprod$Productivity)
-
-truc = RLSwithprod %>% filter(Class == "transition")
-
-mean(truc$Productivity)
-sd(truc$Productivity)
-(4757/6840)*100
-
-length(unique(data_forproduction$Species))
-
 #Plot S2S3 Figure
-K_by_size(data_forproduction)
+K_by_size(RLS_prod_all)
 
 #Plot Figure S4
 plot_metrics_comparison(RLSwithprod)

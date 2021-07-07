@@ -1,7 +1,4 @@
 
-prod_data = RLS_Covariates
-modeloutput = model_test
-
 model_prob = function(prod_data,modeloutput){
   
   #Full model and delete transition data

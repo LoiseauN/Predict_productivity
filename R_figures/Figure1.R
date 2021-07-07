@@ -7,7 +7,6 @@
 #' @export
 #'
 
-data_prod = data_prod_management_noNA
 
 plot_classes <- function(data_prod){
   

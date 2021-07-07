@@ -36,37 +36,22 @@ sapply(files.source, source)
 
 setwd(here())
 
-
-data_country = data_prod_brut %>% 
-  dplyr::select(SurveyID,Country)
-
-levels(data_prod_management$Effectiveness)  = c("Low","Medium","High","No_Mpa")
-
-data_prod_management$Effectiveness[is.na(data_prod_management$Effectiveness)] = "No_Mpa"
-
-data_prod_management_noNA = data_prod_management %>% 
-  left_join(data_country,by="SurveyID") %>% na.omit()
-
 # #Calculating productivity
-# NC_prod = calc_prod(data_final,500)
-# save(NC_prod, file = "outputs/NC_prod.RData")
+RLS_prod_all = calc_prod(data_final)
+save(RLS_prod_all, file = "outputs/RLS_prod_all.RData")
+RLS_prod = calc_prod_transect(RLS_prod_all,info)
+save(RLS_prod, file = "outputs/RLS_prod.RData")
 
-# #Pooling by transect
-# NC_transect = prod_pool(NC_prod)
-# save(NC_transect, file = "outputs/NC_transect.RData")
-
-
-#Protection classes
-RLS_Management = data_management(data_prod_management_noNA,0.95,0.05,0.75,0.25)
-save(RLS_Management,file="outputs/RLS_Management.RData")
-
-#Trying it out with RLS data
 #Prepping covariates
-RLS_Covariates = data_covariates(RLS_Management)
+RLS_Covariates = data_covariates(RLS_prod,env,socio,mpa)
 save(RLS_Covariates,file="outputs/RLS_Covariates.Rdata")
 
+#Protection classes
+RLS_management = data_management(RLS_Covariates,0.95,0.05,0.75,0.25)
+save(RLS_Management,file="outputs/RLS_Management.RData")
+
 #Modelling
-model_test = test_model(RLS_Covariates)
+model_test = test_model(RLS_management)
 save(model_test, file ="outputs/model_test.RData")
 
 
