@@ -66,22 +66,22 @@ preds = ranger_loop %>%
 
 #GETTING BALANCED ACCURACY FROM ITERATIONS
 
-#Getting balanced accuracy from output list
-preds_class = ranger_loop %>%
-  #Transfomring list into large dataframe
-  flatten_df() %>%
-  #Recuperating column names
-  unnest(cols=c())%>%
-  #Keeping only variables and their importance
-  dplyr::select(Balanced_Accuracy)%>%
-  na.omit()%>%
-  mutate(class = rep(c("deadzone","partial","pristine","transition"),100))%>%
-  group_by(class)%>%
-  dplyr::summarize(Balanced_Accuracy=mean(Balanced_Accuracy))
+# #Getting balanced accuracy from output list
+# preds_class = ranger_loop %>%
+#   #Transfomring list into large dataframe
+#   flatten_df() %>%
+#   #Recuperating column names
+#   unnest(cols=c())%>%
+#   #Keeping only variables and their importance
+#   dplyr::select(Balanced_Accuracy)%>%
+#   na.omit()%>%
+#   mutate(class = rep(c("deadzone","partial","pristine","transition"),100))%>%
+#   group_by(class)%>%
+#   dplyr::summarize(Balanced_Accuracy=mean(Balanced_Accuracy))
 
 output = list(data.frame(rel_inf),
-              data.frame(preds),
-              data.frame(preds_class))
+              data.frame(preds))
+              # data.frame(preds_class))
 
 beep(sound=4)
 

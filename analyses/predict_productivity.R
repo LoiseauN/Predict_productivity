@@ -36,6 +36,9 @@ sapply(files.source, source)
 
 setwd(here())
 
+data_final = data_final %>%
+  filter(K_pred < 20)
+
 # #Calculating productivity
 RLS_prod_all = calc_prod(data_final)
 save(RLS_prod_all, file = "outputs/RLS_prod_all.RData")
@@ -47,11 +50,11 @@ RLS_Covariates = data_covariates(RLS_prod,env,socio,mpa)
 save(RLS_Covariates,file="outputs/RLS_Covariates.Rdata")
 
 #Protection classes
-RLS_management = data_management(RLS_Covariates,0.95,0.05,0.75,0.25)
+RLS_Management = data_management(RLS_Covariates,0.95,0.05,0.75,0.25)
 save(RLS_Management,file="outputs/RLS_Management.RData")
 
 #Modelling
-model_test = test_model(RLS_management)
+model_test = test_model(RLS_Management)
 save(model_test, file ="outputs/model_test.RData")
 
 

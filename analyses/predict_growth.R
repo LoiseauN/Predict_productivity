@@ -55,7 +55,7 @@ gen_model_Linf = save_gen_model_Linf(growth_Linf)
 fish_model_Linf = save_fish_model_Linf(growth_Linf)
 
 #Prepping RLS Data
-RLS_fish <- RLS_data_prep(fish,traits,coef,env)
+RLS_fish = RLS_data_prep(fish,traits,coef,env)
 
 #Predicting K and Linf
 data_merged = merge_growth(data_prepped,RLS_fish,gen_model_K)
@@ -63,3 +63,7 @@ data_K = predict_K(data_merged,gen_model_K,fam_model_K,fish_model_K)
 data_final = predict_Linf(data_K,fam_model_Linf,gen_model_Linf,fish_model_Linf)
 
 save(data_final, file = "outputs/data_final.Rdata")
+
+boxplot(data_final$K_pred)
+
+r

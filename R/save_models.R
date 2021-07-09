@@ -12,7 +12,7 @@
 
 save_fam_model_K <- function(growth_data){
   
-  fam_model <- lmer(logK~logMmax+InvTkb + Diet + (1+logMmax|Family),growth_data,
+  fam_model <- lmer(logK~logMmax+InvTkb + (1+logMmax|Family),growth_data,
                     control = lmerControl(optimizer = "optimx", calc.derivs = T,
                                           optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE)))
   
@@ -32,7 +32,7 @@ save_fam_model_K <- function(growth_data){
 
 save_gen_model_K <- function(growth_data){
   
-  gen_model <- lmer(logK~logMmax+InvTkb + Diet + (1+logMmax|Genus),growth_data,
+  gen_model <- lmer(logK~logMmax+InvTkb + (1+logMmax|Genus),growth_data,
                     control = lmerControl(optimizer = "optimx", calc.derivs = T,
                                           optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE)))
   

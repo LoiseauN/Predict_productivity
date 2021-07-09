@@ -1,8 +1,16 @@
 
+
+
+
 model_prob = function(prod_data,modeloutput){
   
+  #Selecting covariables of interest
+  data_formodel = prod_data %>%
+    dplyr::select(Depth:Effectiveness,Class)%>%
+    na.omit()
+  
   #Full model and delete transition data
-  mod = ranger(Class~.,data=prod_data,mtry=3,probability = T,num.trees=1000)
+  mod = ranger(Class~.,data=data_formodel,mtry=3,probability = T,num.trees=1000)
   
   var_imp = as.data.frame(modeloutput[1]) %>%
     arrange(-percentage) %>%
@@ -61,7 +69,7 @@ model_prob = function(prod_data,modeloutput){
            y="")+
       guides(fill=F)
     
-    (plots = ggarrange(pristine, partial, deadzone,transition, ncol = 4,nrow=1))
+    (plots = ggarrange(pristine, partial, deadzone,transition, ncol = 1,nrow=4))
     
     plot_list[[i]] = plots
     

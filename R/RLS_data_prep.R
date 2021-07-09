@@ -116,5 +116,7 @@ RLS_data_prep <- function(RLS_data,Traits_data,Coef_data,Env_data){
     mutate(InvTkb = 1/((Temperature+273.5)*8.62e-05)) %>%
     arrange(SurveyID)
   
+  return(RLS_final)
+  
   beep(sound = 4)
 }

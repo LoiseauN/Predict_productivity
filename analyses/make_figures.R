@@ -27,20 +27,40 @@ setwd(path)
 files.source = list.files(here::here("R_figures"))
 sapply(files.source, source)
 
-#--------------Loading SHP-------------------------
-
-setwd(here())
-nc_map = st_read("shp/NewCaledonia_v7.shp")
-
 #-------------Plots--------------------------------
 
 setwd(here())
+
+Forpaper = RLS_Management %>%
+  mutate(Biom = 10^log10Biom) %>%
+  mutate(Prod = 10^log10Prod) %>%
+  mutate(ProdB = 10^log10ProdB)
+
+
+
+min(Forpaper$ProdB)
+
+RLS_prod_all = RLS_prod_all %>%
+  filter(SurveyID %in% RLS_Covariates$SurveyID) 
+
+length(unique(RLS_prod_all$Species))
+
+test = RLS_Management %>%
+  filter(Class == "pristine")
+
+mean(test$log10ProdB)
+
+10^0.39
+
+nrow(RLS_Management %>% filter(Class == "partial"))
+
+15/3733
 
 #Plot S2S3 Figure
 K_by_size(RLS_prod_all)
 
 #Plot Figure S4
-plot_metrics_comparison(RLSwithprod)
+plot_metrics_comparison(RLS_Management)
 
 #Supp Table 1
 SuppTable1(data_forproduction)
@@ -55,24 +75,13 @@ map_management(RLS_Management)
 plot_var_imp(model_test)
 
 #Figure4 
-model_prob(RLS_Covariates,model_test)
+model_prob(RLS_Management,model_test)
 
 group.colors <- c(deadzone = "#d69d4e", partial = "#046c9a", pristine = "#C1DB60", transition = "#ABDDDE")
 
-(Boxplot = RLS_Management %>%
-  filter(Country != "Australia") %>%
-  ggplot(aes(Class,c,fill=Class,color=Class))+
-  geom_jitter(size = 1,alpha = 0.5)+
-  geom_violin()+
-  scale_colour_manual(values=group.colors,labels=c("Degraded reefs","Productive reefs","Sanctuaries","Transitional reefs"))+
-  scale_fill_manual(values=group.colors,labels=c("Degraded reefs","Productive reefs","Sanctuaries","Transitional reefs"))+
-  theme_minimal())
 
 Noaustralia = RLS_Management %>% filter(Country != "Australia")
 
-upper = quantile(Noaustralia$HDI,0.75)
-
-hist(Noaustralia$MarineEcosystemDependency)
 
 (Density = RLS_Management %>%
   # filter(Country != "Australia") %>%
@@ -152,6 +161,8 @@ RLS_proposed = RLS_Management %>%
   filter(Class == "transition" | Class == "partial") %>%
   mutate(Prop = ifelse(MarineEcosystemDependency>meanDep & loggravtot < meanGrav, "Notake", ifelse(MarineEcosystemDependency < meanDep & loggravtot < meanGrav, "Noentry", ifelse(MarineEcosystemDependency > meanDep& loggravtot > meanGrav, "OECM", "Notake"))),
          Prop = as.factor(Prop))
+
+nrow(RLS_proposed)
 
 RLS_Country = RLS_Management %>% dplyr::select(MarineEcosystemDependency,Country) %>% distinct(Country, .keep_all = T) %>% rename(region = "Country")
 

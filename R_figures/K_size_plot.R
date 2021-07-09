@@ -7,47 +7,51 @@
 #' @export
 #' 
 
+data_prod = RLS_prod_all
+
 K_by_size = function(data_prod){
   
   data_plot = data_prod %>%
     group_by(Species)%>%
-    mutate(K = mean(K_pred),
+    mutate(K = log(mean(K_pred)),
            Family = as.factor(Family),
            Species = as.factor(Species))%>%
     distinct(K,.keep_all=T)
   
   sapply(data_plot,typeof)
   
-  mycolors <- colorRampPalette(wes_palette("Darjeeling1", 27, type = "continuous"))(55)
+  mycolors <- colorRampPalette(wes_palette("Darjeeling1", 27, type = "continuous"))(138)
   
-  (p = ggscatter(data_plot,x="Size.max",y="K_pred",
+  (p = ggscatter(data_plot,x="MaxLength",y="K_pred",
             color="Family",
             palette = mycolors,
             size=3,alpha=0.6)+
-    border()+geom_smooth(se=F,color="black")+    
+    border()+ 
     labs(
     y="Estimated growth rate K",
     x="Maximum observed size (cm)")+
-    theme(legend.position = "top", legend.key.width=unit(3,"cm")))
+    theme(legend.position = "none", legend.key.width=unit(3,"cm")))
     
   ggsave("Figures/K_by_size.pdf",height=210,width=297, units = "mm")
   ggsave("Figures/K_by_size.png",height=210,width=297, units = "mm")
   
   #Details for each Family and Genus 
+  unique(RLS_prod_all$Family)
   
   data_lutjanidae = data_prod %>%
-    filter(Family == "Lutjanidae")%>%
+    filter(Family == "Acanthuridae")%>%
     group_by(Species)%>%
-    mutate(K_pred2 = mean(K_pred))%>%
+    mutate(K_pred2 = log(mean(K_pred)+1))%>%
     ungroup()
   
   data_labridae = data_prod %>%
-    filter(Family == "Labridae")%>%
+    filter(Family == "Balistidae")%>%
     group_by(Species)%>%
     mutate(K_pred2 = mean(K_pred))%>%
+    filter(K_pred2<1)%>%
     ungroup()
   
-  (p_lutjanidae = ggscatter(data_lutjanidae,x="Size.max",y="K_pred2",
+  (p_lutjanidae = ggscatter(data_lutjanidae,x="MaxLength",y="K_pred2",
                  palette = mycolors,
                  size=3,alpha=0.6)+
       border()+ stat_smooth(method = lm, formula = y ~ log(x)) +
@@ -57,7 +61,7 @@ K_by_size = function(data_prod){
          y="Estimated growth rate K",
          x="Maximum observed size (cm)"))
   
-  (p_labridae = ggscatter(data_labridae,x="Size.max",y="K_pred2",
+  (p_labridae = ggscatter(data_labridae,x="MaxLength",y="K_pred2",
                  palette = mycolors,
                  size=3,alpha=0.6)+
       add_fishape(family="Labridae",option="Epibulus_insidiator",
@@ -81,8 +85,8 @@ K_by_size = function(data_prod){
     mutate(K_pred2 = mean(K_pred))%>%
     ungroup()
   
-  (p_lutjanus = ggscatter(data_lutjanus,x="Size.max",y="K_pred2",
-                 palette = pal,
+  (p_lutjanus = ggscatter(data_lutjanus,x="MaxLength",y="K_pred2",
+                 palette = mycolors,
                  size=3,alpha=0.6)+
       border()+ stat_smooth(method = lm, formula = y ~ log(x)) +
     add_fishape(family="Lutjanidae",option="Lutjanus_gibbus",
@@ -94,8 +98,8 @@ K_by_size = function(data_prod){
   test  = data_prod %>%
     filter(Family == "Labridae")
   
-  (p_bodianus = ggscatter(data_bodianus,x="Size.max",y="K_pred2",
-                 palette = pal,
+  (p_bodianus = ggscatter(data_bodianus,x="MaxLength",y="K_pred2",
+                 palette = mycolors,
                  size=3,alpha=0.6)+
       border()+ stat_smooth(method = lm, formula = y ~ log(x))+
     labs(title="Cheilinus",
