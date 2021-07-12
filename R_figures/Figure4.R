@@ -1,7 +1,4 @@
 
-
-
-
 model_prob = function(prod_data,modeloutput){
   
   #Selecting covariables of interest

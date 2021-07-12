@@ -7,11 +7,25 @@
 #' @export
 #' 
 
+data_prod = RLS_Management
 map_management <- function(data_prod){
   
   WorldData <- map_data('world') %>% filter(region != "Antarctica")
   
   group.colors <- c(deadzone = "#d69d4e", partial = "#046c9a", pristine = "#C1DB60", transition = "#ABDDDE")
+  
+  (plot_world = ggplot() +
+    geom_map(data = WorldData, map = WorldData,
+             aes(x = long, y = lat, group = group, map_id=region),
+             colour = "black",fill="#171F28", size=0.2)+
+    geom_point(data = data_prod, size = 4, alpha = 0.5, aes(x=SiteLongitude, y= SiteLatitude, colour=Class))+
+    scale_colour_manual(values=group.colors,labels=c("Degraded reefs","Productive reefs","Sanctuaries","Transitional reefs"))+
+    coord_map("rectangular", lat0=0, xlim=c(-180,180), ylim=c(-60, 90))+
+      theme(legend.key.size = unit(2, 'cm'))+
+    theme_void())
+  
+  ggsave(plot_world, file = "figures/map_world.png",width = 24.00, height = 15.75, units= "in",dpi= 600)
+  ggsave(plot_world, file = "figures/map_world.pdf",width = 24.00, height = 15.75, units= "in",dpi= 600)
   
   sites_pristine = data_prod %>% filter(Class == "pristine")
   sites_partial  = data_prod %>% filter(Class == "partial")

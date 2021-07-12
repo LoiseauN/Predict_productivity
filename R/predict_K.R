@@ -21,7 +21,7 @@ predict_K <- function(data_prod,gen_model,fam_model,fish_model){
     
     if(!is.na(data_prod$K_growth[i])) {
       
-      data_prod$K_pred[i] = data_prod$K_growth[i]* exp((data_prod$SlopeInvTkb_growth[i]/8.62e-05)*((1/(data_prod$sstmean_growth[i]))-(1/(data_prod$Temperature[i]+237.5))))  }
+      data_prod$K_pred[i] = data_prod$K_growth[i] * exp((data_prod$SlopeInvTkb_growth[i]/8.62e-05)*((1/(data_prod$sstmean_growth[i]))-(1/(data_prod$Temperature[i]+237.5))))  }
     
     else if (is.na(data_prod$K_growth[i]) & data_prod$Genus[i] %in% gen_model$Genus)  { 
       

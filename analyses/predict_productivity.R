@@ -37,11 +37,19 @@ sapply(files.source, source)
 setwd(here())
 
 data_final = data_final %>%
-  filter(K_pred < 20)
+  mutate(K_pred = ifelse(!is.na(K_growth),K_pred/10,K_pred))
 
 # #Calculating productivity
 RLS_prod_all = calc_prod(data_final)
+
+RLS_prod_all = RLS_prod_all %>%
+  group_by(SurveyID) %>%
+  filter(sum(Biom) < 10000)
+
 save(RLS_prod_all, file = "outputs/RLS_prod_all.RData")
+
+min(RLS_prod_all$K_pred)
+
 RLS_prod = calc_prod_transect(RLS_prod_all,info)
 save(RLS_prod, file = "outputs/RLS_prod.RData")
 
@@ -50,7 +58,7 @@ RLS_Covariates = data_covariates(RLS_prod,env,socio,mpa)
 save(RLS_Covariates,file="outputs/RLS_Covariates.Rdata")
 
 #Protection classes
-RLS_Management = data_management(RLS_Covariates,0.95,0.05,0.75,0.25)
+RLS_Management = data_management(RLS_Covariates,0.95,0.25,0.75,0.25)
 save(RLS_Management,file="outputs/RLS_Management.RData")
 
 #Modelling

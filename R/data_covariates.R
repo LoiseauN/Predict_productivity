@@ -7,11 +7,6 @@
 #' @export
 #' 
 
-data_prod = RLS_prod
-env_data = env 
-mpa_data = mpa
-socio_data = socio
-
 
 data_covariates <- function(data_prod,env_data,mpa_data,socio_data){
   

@@ -64,6 +64,3 @@ data_final = predict_Linf(data_K,fam_model_Linf,gen_model_Linf,fish_model_Linf)
 
 save(data_final, file = "outputs/data_final.Rdata")
 
-boxplot(data_final$K_pred)
-
-r

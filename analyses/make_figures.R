@@ -31,33 +31,51 @@ sapply(files.source, source)
 
 setwd(here())
 
+RLS_prod_figures = RLS_prod_all %>%
+  filter(SurveyID %in% RLS_Management$SurveyID)
+
+temp = RLS_prod %>%
+  filter(SurveyID %in% RLS_Management$SurveyID)
+
+RLS_Management %>%
+  group_by(Class) %>%
+  count()
+
+2493/3735
+
+
+#Getting max min parameters
 Forpaper = RLS_Management %>%
   mutate(Biom = 10^log10Biom) %>%
   mutate(Prod = 10^log10Prod) %>%
   mutate(ProdB = 10^log10ProdB)
 
-
-
-min(Forpaper$ProdB)
-
-RLS_prod_all = RLS_prod_all %>%
-  filter(SurveyID %in% RLS_Covariates$SurveyID) 
-
-length(unique(RLS_prod_all$Species))
+length(unique(RLS_prod_figures$Species))
 
 test = RLS_Management %>%
   filter(Class == "pristine")
 
 mean(test$log10ProdB)
 
-10^0.39
-
-nrow(RLS_Management %>% filter(Class == "partial"))
-
-15/3733
-
 #Plot S2S3 Figure
-K_by_size(RLS_prod_all)
+K_by_size(RLS_prod_figures)
+
+
+
+(K_by_family = ggplot(RLS_prod_figures,aes(reorder(Family,-log(K_pred+1)),log(K_pred+1),fill=Family,colour=Family))+
+  geom_jitter(size = 0.1, alpha = 0.2)+
+  geom_boxplot(alpha = 0.7)+
+  scale_fill_viridis_d()+
+  scale_color_viridis_d()+ 
+  theme_bw()+
+  theme(legend.position = "none")+
+  theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
+  labs( y = "Estimated growth rate (log scale)",
+        x = ""))
+
+ggsave("Figures/K_by_family.pdf",height=210,width=297, units = "mm")
+ggsave("Figures/K_by_family.png",height=210,width=297, units = "mm")
+
 
 #Plot Figure S4
 plot_metrics_comparison(RLS_Management)
@@ -67,6 +85,8 @@ SuppTable1(data_forproduction)
 
 #Figure 1
 plot_classes(RLS_Management)
+
+quantile((10^(RLS_Management$log10Biom)*10),0.6)
 
 #Figure 2
 map_management(RLS_Management)
@@ -119,7 +139,7 @@ hist(log(RLS_Management$gravtot2))
 meanDep= mean(RLS_Management$MarineEcosystemDependency,na.rm=T)
 meanGrav = mean(log(RLS_Management$gravtot2+1),na.rm=T)
 
-RLS_Management %>%
+(RLS_Management %>%
   filter(Class == "transition" | Class == "partial") %>%
   filter(Effectiveness == "No_Mpa") %>%
   mutate(loggravtot = log(gravtot2+1)) %>%
@@ -132,12 +152,12 @@ RLS_Management %>%
   theme_minimal()+
   labs(x= "Marine Ecosystem Dependency",
        y= "Gravity",
-       color = "Proposed Management")
+       color = "Proposed Management"))
 
 ggsave("figures/managementcutoff.png", width = 297, height = 210,units="mm")
 ggsave("figures/managementcutoff.pdf", width = 297, height = 210,units="mm")
 
-RLS_Management %>%
+(RLS_Management %>%
   filter(Class == "transition" | Class == "partial") %>%
   filter(Effectiveness == "No_Mpa") %>%
   mutate(loggravtot = log(gravtot2+1)) %>% 
@@ -149,7 +169,7 @@ RLS_Management %>%
   labs(x= "Biomass",
        y= "Productivity",
        color = "Proposed Management")+
-  theme_minimal()
+  theme_minimal())
 
 ggsave("figures/managementmetrics.png",width = 297, height = 210,units="mm")
 ggsave("figures/managementmetrics.pdf",width = 297, height = 210,units="mm")
@@ -189,4 +209,5 @@ ggplot() +
       color = "Proposed Management")
 
 ggsave("figures/Managementmap.pdf", width = 24.00, height = 15.75, units= "in",dpi= 600)
+ggsave("figures/Managementmap.png", width = 24.00, height = 15.75, units= "in",dpi= 600)
 

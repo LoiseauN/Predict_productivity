@@ -7,48 +7,44 @@
 #' @export
 #' 
 
-data_prod = RLS_prod_all
-
 K_by_size = function(data_prod){
   
   data_plot = data_prod %>%
     group_by(Species)%>%
-    mutate(K = log(mean(K_pred)),
+    mutate(K = log(mean(K_pred)+1),
            Family = as.factor(Family),
            Species = as.factor(Species))%>%
     distinct(K,.keep_all=T)
   
-  sapply(data_plot,typeof)
   
   mycolors <- colorRampPalette(wes_palette("Darjeeling1", 27, type = "continuous"))(138)
   
-  (p = ggscatter(data_plot,x="MaxLength",y="K_pred",
+  (p = ggscatter(data_plot,x="MaxLength",y="K",
             color="Family",
             palette = mycolors,
             size=3,alpha=0.6)+
     border()+ 
     labs(
-    y="Estimated growth rate K",
+    y="Estimated growth rate K (log scale)",
     x="Maximum observed size (cm)")+
-    theme(legend.position = "none", legend.key.width=unit(3,"cm")))
+    theme(legend.position = "none", legend.key.width=unit(3,"cm")) + stat_smooth(method = lm, formula = y ~ log(x),se=F,))
     
   ggsave("Figures/K_by_size.pdf",height=210,width=297, units = "mm")
   ggsave("Figures/K_by_size.png",height=210,width=297, units = "mm")
-  
+
   #Details for each Family and Genus 
   unique(RLS_prod_all$Family)
   
   data_lutjanidae = data_prod %>%
-    filter(Family == "Acanthuridae")%>%
+    filter(Family == "Lutjanidae")%>%
     group_by(Species)%>%
-    mutate(K_pred2 = log(mean(K_pred)+1))%>%
+    mutate(K_pred2 = mean(K_pred))%>%
     ungroup()
   
   data_labridae = data_prod %>%
-    filter(Family == "Balistidae")%>%
+    filter(Family == "Labridae")%>%
     group_by(Species)%>%
     mutate(K_pred2 = mean(K_pred))%>%
-    filter(K_pred2<1)%>%
     ungroup()
   
   (p_lutjanidae = ggscatter(data_lutjanidae,x="MaxLength",y="K_pred2",
@@ -80,7 +76,7 @@ K_by_size = function(data_prod){
     ungroup()
   
   data_bodianus = data_prod %>%
-    filter(Genus == "Cheilinus")%>%
+    filter(Genus == "Scarus")%>%
     group_by(Species)%>%
     mutate(K_pred2 = mean(K_pred))%>%
     ungroup()
@@ -95,9 +91,7 @@ K_by_size = function(data_prod){
          y="Estimated growth rate K",
          x="Maximum observed size (cm)"))
   
-  test  = data_prod %>%
-    filter(Family == "Labridae")
-  
+
   (p_bodianus = ggscatter(data_bodianus,x="MaxLength",y="K_pred2",
                  palette = mycolors,
                  size=3,alpha=0.6)+

@@ -56,7 +56,9 @@ RLS_data_prep <- function(RLS_data,Traits_data,Coef_data,Env_data){
     dplyr::filter(Class == "Actinopterygii" & Class != "Syngnathidae") %>%
     filter(Family != "Anguillidae", Family != "Congridae", Family != "Muraenidae", Family != "Ophichthidae") %>% 
     #Removing small crypto 
-    filter(Sizeclass != 2.5) %>%
+    filter(Family != "Chironemidae", Family != "Pinguipedidae", Family != "Chaenopsidae", Family != "Tripterygiidae", Family != "Gobiidae", Family != "Callionymidae", Family != "Blenniidae",
+           Family != "Labrisomidae", Family != "Microdesmidae", Family != "Pholidichthyidae") %>%
+    filter(Sizeclass > 5) %>%
     #Merging with temperature
     merge(SST,by="SurveyID") %>%
     #Merging with coefficients

@@ -9,7 +9,7 @@
 
 plot_metrics_comparison = function(data_transect){
 
-  prod_biom_lm = summary(lm(log10Prod~log10Biom,data_transect))$adj.r.squared
+  prod_biom_lm = cor(data_transect$log10Prod,data_transect$log10Biom,method="pearson")
   
   ggplot(data_transect,aes(x=log10Biom,y=log10Prod))+
     geom_point(aes(colour=log(gravtot2+1)))+
@@ -21,7 +21,7 @@ plot_metrics_comparison = function(data_transect){
   
   ggsave("Figures/prod_biom.png",height=210, width= 297,units="mm")
   
-  prodB_biom_lm = summary(lm(log10ProdB~log10Biom,data_transect))$adj.r.squared
+  prodB_biom_lm =  cor(data_transect$log10ProdB,data_transect$log10Biom,method="pearson")
   
   ggplot(data_transect,aes(log10Biom,log10ProdB))+
     geom_point(aes(colour=log(gravtot2+1)))+
@@ -33,7 +33,7 @@ plot_metrics_comparison = function(data_transect){
   
   ggsave("Figures/prodB_biom.png",height=210, width= 297,units="mm")
   
-  prodB_prod_lm = summary(lm(log10ProdB~log10Prod,data_transect))$adj.r.squared
+  prodB_prod_lm = cor(data_transect$log10ProdB,data_transect$log10Prod,method="pearson") 
   
   ggplot(data_transect,aes(log10ProdB,log10Prod))+
     geom_point(aes(colour=log(gravtot2+1)))+

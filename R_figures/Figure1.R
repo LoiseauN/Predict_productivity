@@ -11,7 +11,7 @@
 plot_classes <- function(data_prod){
   
   biom75 = quantile(data_prod$log10Biom,0.95)
-  biom25 = quantile(data_prod$log10Biom,0.05)
+  biom25 = quantile(data_prod$log10Biom,0.25)
   prod75 = quantile(data_prod$log10ProdB,0.75)
   prod25 = quantile(data_prod$log10ProdB,0.25)
   
@@ -30,6 +30,7 @@ plot_classes <- function(data_prod){
      theme_classic())
   
   ggsave("Figures/Figure1.pdf",dpi=300,width = 297, height = 210,units = "mm")
+  ggsave("Figures/Figure1.png",dpi=300,width = 297, height = 210,units = "mm")
   
   
 }
