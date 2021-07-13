@@ -182,6 +182,10 @@ RLS_proposed = RLS_Management %>%
   mutate(Prop = ifelse(MarineEcosystemDependency>meanDep & loggravtot < meanGrav, "Notake", ifelse(MarineEcosystemDependency < meanDep & loggravtot < meanGrav, "Noentry", ifelse(MarineEcosystemDependency > meanDep& loggravtot > meanGrav, "OECM", "Notake"))),
          Prop = as.factor(Prop))
 
+lelz = RLS_proposed %>%
+  group_by(Prop) %>%
+  count()
+
 nrow(RLS_proposed)
 
 RLS_Country = RLS_Management %>% dplyr::select(MarineEcosystemDependency,Country) %>% distinct(Country, .keep_all = T) %>% rename(region = "Country")

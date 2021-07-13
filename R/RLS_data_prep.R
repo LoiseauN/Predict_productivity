@@ -104,16 +104,8 @@ RLS_data_prep <- function(RLS_data,Traits_data,Coef_data,Env_data){
   RLS_final = RLS_clean %>%
     # removing transects with erroneous size data ----
     filter(!(SurveyID %in% unique(outlier_size$SurveyID))) %>%
-    #Creating four size classes according to fish mean size
-    mutate(SizeClass = ifelse(Sizeclass < 20,1,ifelse(Sizeclass >= 20 & Sizeclass < 40, 2,
-                                                      ifelse(Sizeclass >= 40 & Sizeclass < 80, 3, ifelse(Sizeclass >= 80, 4,NA)))))%>%
-    
-    #Adding column with cutting distance
-    mutate(CutDist = ifelse(Sizeclass < 20,5,ifelse(Sizeclass >= 20 & Sizeclass < 40, 6,
-                                                    ifelse(Sizeclass >= 40 & Sizeclass < 80, 8, ifelse(Sizeclass >= 80, 10,NA)))))%>%
-    
     #Calculating Area for each transect 
-    mutate(Area=50*5) %>%
+    mutate(Area=50*10) %>%
     #Parameter for MTE
     mutate(InvTkb = 1/((Temperature+273.5)*8.62e-05)) %>%
     arrange(SurveyID)

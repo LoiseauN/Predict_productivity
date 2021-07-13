@@ -57,9 +57,27 @@ fish_model_Linf = save_fish_model_Linf(growth_Linf)
 #Prepping RLS Data
 RLS_fish = RLS_data_prep(fish,traits,coef,env)
 
+data_merged = data_prepped %>% mutate(K_growth = NA) %>% rename(Temperature = "sstmean") %>% mutate(Temperature = Temperature - 237.5)
+
 #Predicting K and Linf
-data_merged = merge_growth(data_prepped,RLS_fish,gen_model_K)
+# data_merged = merge_growth(data_prepped,RLS_fish,gen_model_K)
 data_K = predict_K(data_merged,gen_model_K,fam_model_K,fish_model_K)
+
+data_plot = data_K %>%
+  pivot_longer(c(K,K_pred))%>%
+  mutate(value = log(value+1))
+
+ggplot(data_plot,aes(value,fill=name))+
+  geom_density(alpha = 0.6)+
+  scale_fill_manual(labels = c("Observed K","Predicted K"), values = c("#1E72A6","#FDDA26"))+
+  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
+        panel.background = element_blank(), axis.line = element_line(colour = "black"))+
+  labs(x = "Growth rate",
+       y=  "Density")+
+  guides(fill = guide_legend(title="Growth rate"))
+
+ggsave("figures/PredictedObservedK.pdf",width = 297, height = 210,unit="mm")
+
 data_final = predict_Linf(data_K,fam_model_Linf,gen_model_Linf,fish_model_Linf)
 
 save(data_final, file = "outputs/data_final.Rdata")
