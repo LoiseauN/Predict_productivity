@@ -16,7 +16,7 @@ Linf_gen_perf <- function(growth_data){
     
     #Split data into 80% and 20% for crossvalidation 
     
-    growth_data_split <- growth_data %>% 
+    growth_data_split <- growth_data %>%
       initial_split(prop=0.8)
     
     growth_data_train <-  training(growth_data_split)

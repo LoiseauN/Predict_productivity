@@ -55,13 +55,20 @@ gen_model_Linf = save_gen_model_Linf(growth_Linf)
 fish_model_Linf = save_fish_model_Linf(growth_Linf)
 
 #Prepping RLS Data
+subdataprep = data_prepped %>% dplyr::select(Species,K)
+
 RLS_fish = RLS_data_prep(fish,traits,coef,env)
 
+#For testing with intial databse 
 data_merged = data_prepped %>% mutate(K_growth = NA) %>% rename(Temperature = "sstmean") %>% mutate(Temperature = Temperature - 237.5)
 
 #Predicting K and Linf
-# data_merged = merge_growth(data_prepped,RLS_fish,gen_model_K)
+data_merged = merge_growth(data_prepped,RLS_fish,gen_model_K)
+data_merged = data_merged %>% mutate(K_growth = NA)
+  
 data_K = predict_K(data_merged,gen_model_K,fam_model_K,fish_model_K)
+
+
 
 data_plot = data_K %>%
   pivot_longer(c(K,K_pred))%>%
