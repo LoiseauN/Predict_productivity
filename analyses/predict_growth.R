@@ -113,7 +113,9 @@ data_merged = merge_growth(data_prepped,RLS_fish,gen_model_K)
 data_mergedtest = data_merged %>% mutate(K_growth = NA)
 
 # save(data_merged, file = "outputs/data_merged.Rdata")
-data_final = predict_K(data_merged,gen_model_K,fam_model_K,fish_model_K)
+#AT SPECIES LEVEL USING THIS FORMULAE WE OVERSTIMATE BY A FACTOR 10 
+data_final = predict_K(datatest,gen_model_K,fam_model_K,fish_model_K)
+
 
 boxplot(data_final$K_pred)
 save(data_final, file = "outputs/data_final.Rdata")
