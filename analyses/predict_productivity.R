@@ -36,9 +36,6 @@ sapply(files.source, source)
 
 setwd(here())
 
-data_final = data_final %>%
-  mutate(K_pred = ifelse(!is.na(K_growth),K_pred/10,K_pred))
-
 # #Calculating productivity
 RLS_prod_all = calc_prod(data_final)
 
@@ -47,8 +44,6 @@ RLS_prod_all = RLS_prod_all %>%
   filter(sum(Biom) < 10000)
 
 save(RLS_prod_all, file = "outputs/RLS_prod_all.RData")
-
-min(RLS_prod_all$K_pred)
 
 RLS_prod = calc_prod_transect(RLS_prod_all,info)
 save(RLS_prod, file = "outputs/RLS_prod.RData")

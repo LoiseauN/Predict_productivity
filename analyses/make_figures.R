@@ -41,9 +41,6 @@ RLS_Management %>%
   group_by(Class) %>%
   count()
 
-2493/3735
-
-
 #Getting max min parameters
 Forpaper = RLS_Management %>%
   mutate(Biom = 10^log10Biom) %>%
@@ -59,7 +56,6 @@ mean(test$log10ProdB)
 
 #Plot S2S3 Figure
 K_by_size(RLS_prod_figures)
-
 
 
 (K_by_family = ggplot(RLS_prod_figures,aes(reorder(Family,-log(K_pred+1)),log(K_pred+1),fill=Family,colour=Family))+
@@ -99,9 +95,7 @@ model_prob(RLS_Management,model_test)
 
 group.colors <- c(deadzone = "#d69d4e", partial = "#046c9a", pristine = "#C1DB60", transition = "#ABDDDE")
 
-
 Noaustralia = RLS_Management %>% filter(Country != "Australia")
-
 
 (Density = RLS_Management %>%
   # filter(Country != "Australia") %>%
