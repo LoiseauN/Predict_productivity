@@ -12,7 +12,7 @@ test_model <- function(prod_data){
   
   #Selecting covariables of interest
   data_formodel = prod_data %>%
-    dplyr::select(Depth:Effectiveness,Class)%>%
+    dplyr::select(-c(SurveyID, log10ProdB:Country)) %>%
     na.omit()
 
 #Running random foret a 100 times

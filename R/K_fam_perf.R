@@ -9,7 +9,9 @@
 #' 
 #' 
 
+
 K_fam_perf <- function(growth_data){
+
   
   #Multiple cross validation procedures to get mean R squared model
   test <-  mclapply(1:100,function(p){
@@ -29,6 +31,7 @@ K_fam_perf <- function(growth_data){
                    control = lmerControl(optimizer = "optimx", calc.derivs = T,
                                          optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE)))
   
+  
   #Getting family model parameters 
   fam_model_clean <-  broom.mixed::tidy(fam_model,effects="ran_coefs") %>%
     #Dividing one column into three columns  for each coeff: Intercept, logMmax and InvTkb
@@ -45,6 +48,20 @@ K_fam_perf <- function(growth_data){
   
   #Peformance of family model
   (fam_perf <- summary(lm(K~K_pred,fam_model_clean))$adj.r.squared)
+
+  ggplot(fam_model_clean,aes(log(K+1), log(K_pred+1)))+
+    geom_point(aes(color=Family)) +
+    geom_smooth(method = "lm")+
+    scale_color_viridis_d(guide="none") +
+    theme_minimal() +
+    labs(x = "Observed growth rates (log scale)",
+         y  = "Predicted growth rates (log scale)") +
+    theme(text = element_text(size=20),
+          axis.text.x = element_text(angle=90, hjust=1))
+
+  ggsave("figures/Family_crossvaldiation.png", width = 20, height = 15)
+  # 
+
   
   #---------------GETTING MODEL PERFORMANCEs-----------------------------------
   

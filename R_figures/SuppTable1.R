@@ -13,7 +13,7 @@ SuppTable1 = function(data_prod){
     dplyr::select(Family,Genus)%>%
     distinct(Genus, .keep_all = T)
   
-  write.table(data_family_genus, file = "Figures/SuppTable1.txt", sep = ",", quote = FALSE, row.names = F)
+  write.csv(data_family_genus, file = "Figures/SuppTable1.csv", sep = ",", quote = FALSE, row.names = F)
   
   
 }

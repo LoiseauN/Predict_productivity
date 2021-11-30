@@ -29,6 +29,8 @@ K_gen_perf <- function(growth_data){
                       control = lmerControl(optimizer = "optimx", calc.derivs = T,
                                             optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE)))
     
+    fixef(gen_model)
+    
     #Cleaning genus model parameters 
     gen_model_clean <- broom.mixed::tidy(gen_model,effects="ran_coefs") %>%
       #Dividing terme column into three columns  for each coeff: Intercept, logMmax and InvTkb
@@ -43,23 +45,24 @@ K_gen_perf <- function(growth_data){
       #Predicting K using MTE
       mutate(K_pred = exp(Intercept) * Mmax**(SlopeLogMmax)*exp(SlopeInvTkb/(8.62e-05*sstmean)))
     
+    (gen_perf <- summary(lm(K~K_pred,gen_model_clean))$adj.r.squared)
+    
+
+     # ggplot(gen_model_clean,aes(log(K+1), log(K_pred+1)))+
+     # geom_point(aes(color=Genus)) +
+     #   geom_smooth(method = "lm")+
+     #   scale_color_viridis_d(guide="none") +
+     #   theme_minimal() +
+     #   labs(x = "Observed growth rates (log scale)",
+     #        y  = "Predicted growth rates (log scale)")+
+     #   theme(text = element_text(size=20))
+
+    # ggsave("figures/Genus_crossvaldiation.png", width = 20, height = 15)
+    # 
+    length(unique(data_prepped$Genus))
+
     #Performance of genus model
-    gen_perf <- summary(lm(K~K_pred,gen_model_clean))$adj.r.squared
-    
-    by_genus  = group_by(gen_model_clean,Genus)
-    
-    test = do(by_genus,augment(lm(K~K_pred,data=.))) %>%
-      mutate(diff = abs(K - K_pred))
-    
-    ggplot(test, aes(reorder(Genus,-diff),diff,color=Genus))+
-      geom_boxplot()+
-      guides(color=FALSE)+
-      theme_bw()+
-      theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))
-    
-    ggplot(test, aes(.fitted, .resid)) +
-      geom_point(aes(group=Family,color=Family),alpha= 1/3)+
-      geom_smooth()
+    (gen_perf <- summary(lm(K~K_pred,gen_model_clean))$adj.r.squared)
     
     
     #---------------GETTING MODEL PERFORMANCEs-----------------------------------

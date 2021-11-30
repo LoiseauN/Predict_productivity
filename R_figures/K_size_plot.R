@@ -9,6 +9,7 @@
 
 K_by_size = function(data_prod){
   
+  
   data_plot = data_prod %>%
     group_by(Species)%>%
     mutate(K = log(mean(K_pred)+1),
@@ -33,10 +34,10 @@ K_by_size = function(data_prod){
   ggsave("Figures/K_by_size.png",height=210,width=297, units = "mm")
 
   #Details for each Family and Genus 
-  unique(RLS_prod_all$Family)
+  unique(data_prod$Family)
   
-  data_lutjanidae = data_prod %>%
-    filter(Family == "Lutjanidae")%>%
+  data_Serranidae = data_prod %>%
+    filter(Family == "Serranidae")%>%
     group_by(Species)%>%
     mutate(K_pred2 = mean(K_pred))%>%
     ungroup()
@@ -47,62 +48,65 @@ K_by_size = function(data_prod){
     mutate(K_pred2 = mean(K_pred))%>%
     ungroup()
   
-  (p_lutjanidae = ggscatter(data_lutjanidae,x="MaxLength",y="K_pred2",
+  (p_Serranidae = ggscatter(data_Serranidae,x="MaxLength",y="K_pred2",
                  palette = mycolors,
                  size=3,alpha=0.6)+
       border()+ stat_smooth(method = lm, formula = y ~ log(x)) +
-    add_fishape(family="Lutjanidae",option="Lutjanus_gibbus",
-                xmin=140,xmax=160,ymin=0.75,ymax=1,fill="darkblue",alpha=0.7)+
-    labs(title="Lutjanidae",
+    # add_fishape(family="Lutjanidae",option="Lutjanus_gibbus",
+    #             xmin=140,xmax=160,ymin=0.75,ymax=1,fill="darkblue",alpha=0.7)+
+    labs(title="Serranidae",
          y="Estimated growth rate K",
          x="Maximum observed size (cm)"))
   
   (p_labridae = ggscatter(data_labridae,x="MaxLength",y="K_pred2",
                  palette = mycolors,
                  size=3,alpha=0.6)+
-      add_fishape(family="Labridae",option="Epibulus_insidiator",
-                  xmin=200,xmax=230,ymin=5,ymax=8,fill="darkblue",alpha=0.7)+
+      # add_fishape(family="Labridae",option="Epibulus_insidiator",
+      #             xmin=200,xmax=230,ymin=5,ymax=8,fill="darkblue",alpha=0.7)+
       border()+ stat_smooth(method = lm, formula = y ~ log(x)) +
     labs(title="Labridae",
          y="Estimated growth rate K",
          x="Maximum observed size (cm)"))
   
-  p_family = ggarrange(p_lutjanidae,p_labridae)
+  (p_family = ggarrange(p_Serranidae,p_labridae))
   
-  data_lutjanus = data_prod %>%
-    filter(Genus == "Lutjanus")%>%
+  serranidae = data_prod %>% filter(Family == "Labridae")
+  unique(serranidae$Genus)
+  
+  data_Epinephelus = data_prod %>%
+    filter(Genus == "Epinephelus")%>%
     group_by(Species)%>%
     mutate(K_pred2 = mean(K_pred))%>%
     ungroup()
   
-  data_bodianus = data_prod %>%
+  data_Scarus = data_prod %>%
     filter(Genus == "Scarus")%>%
     group_by(Species)%>%
     mutate(K_pred2 = mean(K_pred))%>%
     ungroup()
   
-  (p_lutjanus = ggscatter(data_lutjanus,x="MaxLength",y="K_pred2",
+  (p_Epinephelus = ggscatter(data_Epinephelus,x="MaxLength",y="K_pred2",
                  palette = mycolors,
                  size=3,alpha=0.6)+
       border()+ stat_smooth(method = lm, formula = y ~ log(x)) +
-    add_fishape(family="Lutjanidae",option="Lutjanus_gibbus",
-                xmin=140,xmax=160,ymin=0.8,ymax=1,fill="darkblue",alpha=0.7)+
-    labs(title="Lutjanus",
+    # add_fishape(family="Lutjanidae",option="Lutjanus_gibbus",
+    #             xmin=140,xmax=160,ymin=0.8,ymax=1,fill="darkblue",alpha=0.7)+
+    labs(title="Epinephelus",
          y="Estimated growth rate K",
          x="Maximum observed size (cm)"))
   
 
-  (p_bodianus = ggscatter(data_bodianus,x="MaxLength",y="K_pred2",
+  (p_Scarus= ggscatter(data_Scarus,x="MaxLength",y="K_pred2",
                  palette = mycolors,
                  size=3,alpha=0.6)+
       border()+ stat_smooth(method = lm, formula = y ~ log(x))+
-    labs(title="Cheilinus",
+    labs(title="Scarus",
          y="Estimated growth rate K",
-         x="Maximum observed size (cm)")+
-    add_fishape(family="Labridae",option="Epibulus_insidiator",
-                xmin=190,xmax=220,ymin=3,ymax=4,fill="darkblue",alpha=0.7))
+         x="Maximum observed size (cm)"))
+    # add_fishape(family="Labridae",option="Epibulus_insidiator",
+    #             xmin=190,xmax=220,ymin=3,ymax=4,fill="darkblue",alpha=0.7))
   
-  p_genus = ggarrange(p_lutjanus,p_bodianus)
+  p_genus = ggarrange(p_Epinephelus,p_Scarus)
   
   ggarrange(p_family,p_genus,ncol=1)
   

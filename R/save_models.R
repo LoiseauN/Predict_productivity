@@ -9,12 +9,14 @@
 #' 
 #' 
 
-
+growth_data = data_prepped
 save_fam_model_K <- function(growth_data){
   
   fam_model <- lmer(logK~logMmax+InvTkb + (1+logMmax|Family),growth_data,
                     control = lmerControl(optimizer = "optimx", calc.derivs = T,
                                           optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE)))
+  
+  fixef(fam_model)
   
   #Adding the predicted K using metabolic theory equation
   fam_model_K =  broom.mixed::tidy(fam_model,effects="ran_coefs") %>%
@@ -36,6 +38,8 @@ save_gen_model_K <- function(growth_data){
                     control = lmerControl(optimizer = "optimx", calc.derivs = T,
                                           optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE)))
   
+  fixef(gen_model)
+  
   #Adding the predicted K using metabolic theory equation
   gen_model_K =  broom.mixed::tidy(gen_model,effects="ran_coefs") %>%
     #Divising one column into three columns  for each coeff: Intercept, logMmax and InvTkb
@@ -45,6 +49,8 @@ save_gen_model_K <- function(growth_data){
                   Intercept = '(Intercept)',
                   SlopeLogMmax = logMmax,
                   SlopeInvTkb = InvTkb)
+  
+  max(gen_model_K$SlopeLogMmax)
   
   return(gen_model_K)
   
@@ -56,6 +62,8 @@ save_fish_model_K <- function(growth_data){
   fish_model = lmer(logK~logMmax+InvTkb+(1+logMmax|Family),
                     growth_data, control = lmerControl(optimizer = "optimx", calc.derivs = T,
                     optCtrl = list(method = "nlminb", starttests = FALSE, kkt = FALSE)))
+  
+  fixef(fish_model)
   
   
   fish_model_K = fixef(fish_model) %>%

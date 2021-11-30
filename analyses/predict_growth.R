@@ -58,10 +58,10 @@ setwd(here())
 #                 K = "kmax") %>%
 #   dplyr::select(Family,Genus,Species,K,MaxSize,sstmean,a,b)
 
+#Prepping data, removing some errors 
 growth_data = Morais %>% 
-  dplyr::select(Family,Species,MaxSizeTL,Diet,a,b,Linf,Kmax,sstmean) %>%
-  rename(K="Kmax",
-         MaxSize = "MaxSizeTL") %>%
+  dplyr::select(Family,Species,MaxSizeTL,Diet,a,b,Linf,K,sstmean) %>%
+  rename(MaxSize = "MaxSizeTL") %>%
   mutate(Genus = word(Species,1)) %>%
   dplyr::select(-Linf) %>%
   dplyr::select(Family,Genus,Species,Diet,K,MaxSize,sstmean,a,b) %>%
@@ -79,14 +79,16 @@ growth_data = Morais %>%
 data_prepped = data_prep(growth_data)
 save(data_prepped, file ="outputs/data_prepped.RData")
 
+length(unique(data_prepped$Species))
+
 #Testing model performances at predicting growth rates K based on mean adjusted R squared over 100 iterations
-#We should keep Diet here
+#We should NOT keep Diet here
 fam_perf = K_fam_perf(data_prepped)
-fam_diet_perf = K_fam_diet_perf(data_prepped)
+# fam_diet_perf = K_fam_diet_perf(data_prepped)
 
 #We should NOT keep Diet here
 gen_perf = K_gen_perf(data_prepped)
-gen_diet_perf = K_gen_diet_perf(data_prepped)
+# gen_diet_perf = K_gen_diet_perf(data_prepped)
 
 #Testing Linf predictions model performance
 Linf_fam_perf =   Linf_fam_perf(growth_Linf)
@@ -97,6 +99,7 @@ fam_model_K = save_fam_model_K(data_prepped)
 gen_model_K = save_gen_model_K(data_prepped)
 fish_model_K = save_fish_model_K(data_prepped)
 
+
 fam_model_Linf = save_fam_model_Linf(growth_Linf)
 gen_model_Linf = save_gen_model_Linf(growth_Linf)
 fish_model_Linf = save_fish_model_Linf(growth_Linf)
@@ -104,21 +107,28 @@ fish_model_Linf = save_fish_model_Linf(growth_Linf)
 #Prepping RLS Data
 RLS_fish = RLS_data_prep(fish,traits,coef,env)
 
-#For testing with intial databse 
-data_merged = data_prepped %>% mutate(K_growth = NA) %>% rename(Temperature = "sstmean") %>% mutate(Temperature = Temperature - 237.5)
-
 #Predicting K and Linf
 data_merged = merge_growth(data_prepped,RLS_fish,gen_model_K)
-#Temporary fix for Species level prediction
-data_mergedtest = data_merged %>% mutate(K_growth = NA)
 
 # save(data_merged, file = "outputs/data_merged.Rdata")
 #AT SPECIES LEVEL USING THIS FORMULAE WE OVERSTIMATE BY A FACTOR 10 
-data_final = predict_K(datatest,gen_model_K,fam_model_K,fish_model_K)
+data_K = predict_K(data_merged,gen_model_K,fam_model_K,fish_model_K)
 
+data_K_final = data_K %>%
+  mutate(K_pred = ifelse(!is.na(K_growth),K_pred/10,K_pred))
 
-boxplot(data_final$K_pred)
+data_final = predict_Linf(data_K_final,fam_model_Linf,gen_model_Linf,fish_model_Linf)
+# 
 save(data_final, file = "outputs/data_final.Rdata")
+
+
+
+#plot K versus observed
+
+#For testing with intial databse 
+data_merged = data_prepped %>%  mutate(K_growth = NA) %>% rename(Temperature = "sstmean") %>% mutate(Temperature = Temperature - 237.5)
+
+data_K = predict_K(data_merged,gen_model_K,fam_model_K,fish_model_K)
 
 data_plot = data_K %>%
   pivot_longer(c(K,K_pred))%>%
@@ -134,8 +144,3 @@ ggplot(data_plot,aes(value,fill=name))+
   guides(fill = guide_legend(title="Growth rate"))
 
 ggsave("figures/PredictedObservedK.pdf",width = 297, height = 210,unit="mm")
-
-data_final = predict_Linf(data_K,fam_model_Linf,gen_model_Linf,fish_model_Linf)
-
-save(data_final, file = "outputs/data_final.Rdata")
-

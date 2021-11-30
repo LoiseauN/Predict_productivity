@@ -112,5 +112,4 @@ RLS_data_prep <- function(RLS_data,Traits_data,Coef_data,Env_data){
   
   return(RLS_final)
   
-  beep(sound = 4)
 }

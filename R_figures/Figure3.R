@@ -8,7 +8,6 @@
 #' 
 
 
-model_test_output = model_test
 
 plot_var_imp <- function(model_test_output){
   
@@ -22,14 +21,16 @@ plot_var_imp <- function(model_test_output){
     dplyr::summarize(importance.mod.=mean(importance.mod.))%>%
     mutate(percentage = (importance.mod.*100)/sum(importance.mod.))%>%
     arrange(percentage)
+  
+  rel_inf$var_names = c("NGO Presence","Control of Corruption","Depth","Human Development Index","Marine Ecosystem Dependency","No Violence","Effectiveness","Human Voice","Mean DHW (over 5 years)","Mean pH (over 5 years)","Mean SST (over 5 years)","Mean NPP (overs 5 years)","Human gravity")
 
-  plot = ggdotchart(rel_inf,x = "rowname",y="percentage",
-                    color = "rowname",
+  plot = ggdotchart(rel_inf,x = "var_names",y="percentage",
+                    color = "var_names",
                     palette = "simpsons",
                     add = "segments",
-                    add.params = list(color = "rowname",size = 1.5),
+                    add.params = list(color = "var_names",size = 1.5),
                     rotate = TRUE,   
-                    group = "rowname",
+                    group = "var_names",
                     dot.size = 11, 
                     label = round(rel_inf$percentage,4),
                     font.label = list(color = "white", size = 6, 

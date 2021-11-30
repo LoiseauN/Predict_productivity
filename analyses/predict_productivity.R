@@ -36,16 +36,17 @@ sapply(files.source, source)
 
 setwd(here())
 
+
 # #Calculating productivity
 RLS_prod_all = calc_prod(data_final)
-
-RLS_prod_all = RLS_prod_all %>%
-  group_by(SurveyID) %>%
-  filter(sum(Biom) < 10000)
-
+        
 save(RLS_prod_all, file = "outputs/RLS_prod_all.RData")
 
 RLS_prod = calc_prod_transect(RLS_prod_all,info)
+
+#Removing outliers
+RLS_prod = RLS_prod %>% filter(Biom < quantile(RLS_prod$Biom,0.995))
+
 save(RLS_prod, file = "outputs/RLS_prod.RData")
 
 #Prepping covariates
@@ -54,6 +55,8 @@ save(RLS_Covariates,file="outputs/RLS_Covariates.Rdata")
 
 #Protection classes
 RLS_Management = data_management(RLS_Covariates,0.95,0.25,0.75,0.25)
+
+RLS_Management = RLS_Management %>% dplyr::select(-c(mean_chl_5year))
 save(RLS_Management,file="outputs/RLS_Management.RData")
 
 #Modelling

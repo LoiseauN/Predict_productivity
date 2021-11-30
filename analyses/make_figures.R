@@ -1,8 +1,8 @@
 #-----------------Loading packages-------------------
 
 pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot","rnaturalearth","plotly","ggridges","ggbeeswarm","ggforce","rfishbase",
-          "parameters","NbClust","cluster","klaR","beepr",
-          "harrypotter","wesanderson","dichromat","ranger","ggpubr","data.table","pdp","png","sf","broom.mixed","arm","fishualize")
+          "parameters","NbClust","cluster","klaR","beepr","gstat",
+          "harrypotter","wesanderson","dichromat","ranger","ggpubr","data.table","pdp","png","sf","broom.mixed","arm","fishualize","wpp2019","gridExtra","ggpubr","scales","magrittr","hrbrthemes")
 nip <- pkgs[!(pkgs %in% installed.packages())]
 nip <- lapply(nip, install.packages, dependencies = TRUE)
 ip   <- unlist(lapply(pkgs, require, character.only = TRUE, quietly = TRUE))
@@ -34,29 +34,38 @@ setwd(here())
 RLS_prod_figures = RLS_prod_all %>%
   filter(SurveyID %in% RLS_Management$SurveyID)
 
-temp = RLS_prod %>%
+RLS_prod_transect_figures = RLS_prod %>%
   filter(SurveyID %in% RLS_Management$SurveyID)
 
-RLS_Management %>%
-  group_by(Class) %>%
-  count()
-
-#Getting max min parameters
-Forpaper = RLS_Management %>%
-  mutate(Biom = 10^log10Biom) %>%
-  mutate(Prod = 10^log10Prod) %>%
-  mutate(ProdB = 10^log10ProdB)
-
-length(unique(RLS_prod_figures$Species))
-
-test = RLS_Management %>%
+RLS_Management_degraded = RLS_Management %>%
+  filter(Class == "deadzone")
+RLS_Management_partial = RLS_Management %>%
+  filter(Class == "partial")
+RLS_Management_pristine = RLS_Management %>%
   filter(Class == "pristine")
+RLS_Management_transition = RLS_Management %>%
+  filter(Class == "transition")
 
-mean(test$log10ProdB)
+
+
+#Number of reef fish taxonolmy
+length(unique(RLS_prod_figures$Species))
+length(unique(RLS_prod_figures$Family))
+length(unique(RLS_prod_figures$Genus))
+
+#Number of transects, sites, countries
+length(unique(RLS_Management$Country))
+
+#How much does each management class have
+summary(RLS_Management)
+
+121/3739
+186/3739
+902/3739
+2506/3739
 
 #Plot S2S3 Figure
 K_by_size(RLS_prod_figures)
-
 
 (K_by_family = ggplot(RLS_prod_figures,aes(reorder(Family,-log(K_pred+1)),log(K_pred+1),fill=Family,colour=Family))+
   geom_jitter(size = 0.1, alpha = 0.2)+
@@ -66,25 +75,40 @@ K_by_size(RLS_prod_figures)
   theme_bw()+
   theme(legend.position = "none")+
   theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-  labs( y = "Estimated growth rate (log scale)",
+  labs( y = "Estimated growth rate K (log scale)",
         x = ""))
 
 ggsave("Figures/K_by_family.pdf",height=210,width=297, units = "mm")
 ggsave("Figures/K_by_family.png",height=210,width=297, units = "mm")
 
+length(unique(RLS_prod_figures$Family))
+
+#Plot number of predictions by class
+
+ggplot(RLS_prod_figures)+
+  geom_histogram(bins = 30,aes(K_pred,fill=pred_type))+
+  scale_fill_viridis_d()+
+  theme_classic()+
+  labs(x = "Predicted growth rates K",
+       y= "Number of predictions",
+       fill = "Prediction level")
+
+RLS_prod_figures$pred_type = as.factor(RLS_prod_figures$pred_type)
+summary(RLS_prod_figures)
+
+ggsave("Figures/predictionslevels.pdf",height=210,width=297,units="mm")
+ggsave("Figures/predictionslevels.png",height=210,width=297,units="mm")
 
 #Plot Figure S4
 plot_metrics_comparison(RLS_Management)
 
 #Supp Table 1
-SuppTable1(data_forproduction)
+SuppTable1(RLS_prod_figures)
 
 #Figure 1
 plot_classes(RLS_Management)
 
-quantile((10^(RLS_Management$log10Biom)*10),0.6)
-
-#Figure 2
+ #Figure 2
 map_management(RLS_Management)
 
 #Figure 3
@@ -95,117 +119,189 @@ model_prob(RLS_Management,model_test)
 
 group.colors <- c(deadzone = "#d69d4e", partial = "#046c9a", pristine = "#C1DB60", transition = "#ABDDDE")
 
-Noaustralia = RLS_Management %>% filter(Country != "Australia")
-
-(Density = RLS_Management %>%
-  # filter(Country != "Australia") %>%
-  ggplot(aes(x = MarineEcosystemDependency, y = Class, fill = Class))+
-  geom_density_ridges()+
-  # geom_vline(data=RLS_Management,aes(xintercept = 0.8))+
-  # geom_vline(data=RLS_Management,aes(xintercept = 0.85))+
-  scale_fill_manual(values=group.colors,labels=c("Degraded reefs","Productive reefs","Sanctuaries","Transitional reefs"))+
-  theme_ridges())
-
-RLS_Management %>%
-  filter(Class == "transition" | Class == "partial") %>%
-  mutate(HDI_Sep = ifelse(HDI>0.85,"Sanctuary","Partial protection"))%>%
-  ggplot(aes(log10Biom,log10ProdB))+
-  geom_mark_hull(aes(fill=Class,label=Class),con.cap=0)+
-  scale_fill_manual(values=group.colors,labels=c("Degraded reefs","Productive reefs","Sanctuaries","Transitional reefs"))+
-  geom_point(size=3,alpha=0.4,aes(color=HDI_Sep))+
-  scale_color_hp_d(option="NewtScamander")+
-  labs(x= "Biomass",
-       y= "Productivity",
-       color = "HDI")+
-  theme_minimal()
-
-RLS_Management %>%
-  filter(Class == "transition" | Class =="partial") %>%
-  mutate(HDI_Sep = ifelse(HDI>0.85,"Sanctuary","Partial protection"))%>%
-  ggplot(aes(log10Biom,log10ProdB))+
-  geom_mark_hull(aes(fill=Class,label=Class),con.cap=0)+
-  scale_fill_manual(values=group.colors,labels=c("Degraded reefs","Productive reefs","Sanctuaries","Transitional reefs"))+
-  geom_point(size=4,alpha=0.7,aes(color=log(gravtot2)))+
-  scale_color_gradient2(low = "green",mid="white", high ="red")
-
-hist(log(RLS_Management$gravtot2))
-
-meanDep= mean(RLS_Management$MarineEcosystemDependency,na.rm=T)
-meanGrav = mean(log(RLS_Management$gravtot2+1),na.rm=T)
-
-(RLS_Management %>%
-  filter(Class == "transition" | Class == "partial") %>%
-  filter(Effectiveness == "No_Mpa") %>%
-  mutate(loggravtot = log(gravtot2+1)) %>%
-  mutate(HDI_Sep = ifelse(MarineEcosystemDependency>meanDep & loggravtot < meanGrav, "No take", ifelse(MarineEcosystemDependency < meanDep & loggravtot < meanGrav, "No entry", ifelse(MarineEcosystemDependency > meanDep& loggravtot > meanGrav, "OECM", "No take"))))%>%
-  ggplot(aes(MarineEcosystemDependency,loggravtot,color=HDI_Sep))+
-  geom_point()+
-  scale_color_hp_d(option="LunaLovegood")+
-  geom_hline(yintercept=meanGrav,linetype="dashed")+
-  geom_vline(xintercept=meanDep,linetype="dashed")+
-  theme_minimal()+
-  labs(x= "Marine Ecosystem Dependency",
-       y= "Gravity",
-       color = "Proposed Management"))
-
-ggsave("figures/managementcutoff.png", width = 297, height = 210,units="mm")
-ggsave("figures/managementcutoff.pdf", width = 297, height = 210,units="mm")
-
-(RLS_Management %>%
-  filter(Class == "transition" | Class == "partial") %>%
-  filter(Effectiveness == "No_Mpa") %>%
-  mutate(loggravtot = log(gravtot2+1)) %>% 
-  mutate(HDI_Sep = ifelse(MarineEcosystemDependency>meanDep & loggravtot < meanGrav, "No take", ifelse(MarineEcosystemDependency < meanDep & loggravtot < meanGrav, "No entry", ifelse(MarineEcosystemDependency > meanDep& loggravtot > meanGrav, "OECM", "No take"))))%>%
-  ggplot(aes(log10Biom,log10ProdB))+
-  scale_fill_manual(values=group.colors,labels=c("Degraded reefs","Productive reefs","Sanctuaries","Transitional reefs"))+
-  geom_point(size=3,alpha=0.4,aes(color=HDI_Sep))+
-  scale_color_hp_d(option="LunaLovegood")+
-  labs(x= "Biomass",
-       y= "Productivity",
-       color = "Proposed Management")+
-  theme_minimal())
-
-ggsave("figures/managementmetrics.png",width = 297, height = 210,units="mm")
-ggsave("figures/managementmetrics.pdf",width = 297, height = 210,units="mm")
+group.colors2 <- c(partial = "#046c9a", transition = "#ABDDDE")
 
 
-RLS_proposed = RLS_Management %>%
-  filter(Effectiveness == "No_Mpa") %>%
-  mutate(loggravtot = log(gravtot2+1)) %>%
-  filter(Class == "transition" | Class == "partial") %>%
-  mutate(Prop = ifelse(MarineEcosystemDependency>meanDep & loggravtot < meanGrav, "Notake", ifelse(MarineEcosystemDependency < meanDep & loggravtot < meanGrav, "Noentry", ifelse(MarineEcosystemDependency > meanDep& loggravtot > meanGrav, "OECM", "Notake"))),
-         Prop = as.factor(Prop))
+  
+#PLOT MTE
+MTE_fam = fam_model_K %>%
+    merge(data_prepped,by="Family") %>%
+    #Calculating temperature corrected and mass corrected logK
+    mutate(TempCorrectLogK = logK - SlopeInvTkb * InvTkb,
+           TempStandardLogK = logK - SlopeInvTkb * InvTkb + SlopeInvTkb * mean(InvTkb),
+           MassCorrectLogK = logK - SlopeLogMmax * logMmax,
+           MassStandardLogK = logK - SlopeLogMmax * logMmax * mean(logMmax)) %>%
+    #max and min logMmax and InvTkb for all fish
+    mutate(MaxlogMmaxFixe = max(logMmax),
+           MinlogMmaxFixe = min(logMmax),
+           MaxInvTkbFixe = max(InvTkb),
+           MinInvTkbFixe = min(InvTkb),
+           MeanInvTkb = mean(InvTkb),
+           MeanlogMmax = mean(logMmax))%>%
+    #Fixed effects for all fish according to the fish level (from Morais_fish Rdata)
+    mutate(InterceptFixe = 20.11202,
+           SlopelogMmaxFixe = -0.2305791,
+           SlopeInvTkbFixe = 	-0.5000861) %>%
+    #grouping by family and calculating min and max logMmax and InvTkb for each family
+    group_by(Family) %>%
+    mutate(MaxlogMmax = max(logMmax),
+           MinlogMmax = min(logMmax),
+           MaxInvTkb = max(InvTkb),
+           MinInvTkb = min(InvTkb))%>%
+    ungroup()
 
-lelz = RLS_proposed %>%
-  group_by(Prop) %>%
-  count()
 
-nrow(RLS_proposed)
+nth_element <- function(vector, starting_position, n) { 
+  vector[seq(starting_position, length(vector), n)] 
+}
+coli <-sample(nth_element(luv_colours$col, 1, 3)[-c(1:3)])
 
-RLS_Country = RLS_Management %>% dplyr::select(MarineEcosystemDependency,Country) %>% distinct(Country, .keep_all = T) %>% rename(region = "Country")
+(p.temperature.corrected = ggplot(MTE_fam, aes(x=logMmax, y=TempCorrectLogK, colour=Family)) +
+  geom_point(size=1) +
+  scale_colour_manual(values = coli)+
+  labs(title="logMmax predictor effect", x="logMmax",y="Temperature-corrected logK") +
+  geom_segment(aes(x=MinlogMmax, xend=MaxlogMmax, y=Intercept + SlopeLogMmax*MinlogMmax, 
+                   yend=Intercept + SlopeLogMmax*MaxlogMmax,size="Family (random effect)")) +
+  geom_segment(aes(x=MinlogMmaxFixe, xend=MaxlogMmaxFixe, 
+                   y=InterceptFixe + SlopelogMmaxFixe*MinlogMmaxFixe, 
+                   yend=InterceptFixe + SlopelogMmaxFixe*MaxlogMmaxFixe,
+                   size="Fish in general (fixed effect)"),colour="black") +
+  scale_size_manual(name="Predictions", values=c("Family (random effect)"=0.7, "Fish in general (fixed effect)"=1.2))+
+  
+  theme_bw(base_size=10) +
+  theme(
+    plot.title = element_text(color="black", size=25, face="bold.italic",hjust=0.5),
+    axis.title.x = element_text(color="black", size=14, face="bold"),
+    axis.title.y = element_text(color="black", size=14, face="bold")
+  ) +
+  labs(title="Temperature predictor effect",
+       x='1/kT',
+       y="Mass-corrected log K"))
 
-WorldData <- map_data('world') %>% filter(region != "Antarctica") %>% left_join(RLS_Country,by="region") %>% fortify
+ggsave("figures/Temperature_corrected.pdf",height = 210, width = 297, units = "mm")
 
 
-(sites <- st_as_sf(RLS_proposed, coords = c("SiteLongitude", "SiteLatitude"), 
-                   crs = 4326, agr = "constant"))
+(p.mass.corrected = ggplot(MTE_fam, aes(x=InvTkb, y=MassCorrectLogK, colour=Family)) +
+  geom_point(size=1) +
+  scale_colour_manual(values = coli)+
+  labs(title="InvTkb predictor effect", x="InvTkb",y="Mass-corrected logK") +
+  geom_segment(aes(x=MinInvTkb, xend=MaxInvTkb, y=Intercept + SlopeInvTkb*MinInvTkb, 
+                   yend=Intercept + SlopeInvTkb*MaxInvTkb,size="Family (random effect)")) +
+  geom_segment(aes(x=MinInvTkbFixe, xend=MaxInvTkbFixe, y=InterceptFixe + SlopeInvTkbFixe*MinInvTkbFixe, 
+                   yend=InterceptFixe + SlopeInvTkbFixe*MaxInvTkbFixe,
+                   size="Fish in general (fixed effect)"),colour="black") +
+  scale_size_manual(name="Predictions", values=c("Family (random effect)"=0.7, "Fish in general (fixed effect)"=1.2))+
+  theme_bw(base_size=10) +
+  theme(
+    plot.title = element_text(color="black", size=25, face="bold.italic",hjust=0.5),
+    axis.title.x = element_text(color="black", size=14, face="bold"),
+    axis.title.y = element_text(color="black", size=14, face="bold")
+  )+
+  labs(title="Species mass predictor effect",
+       x="Log species mass",
+       y="Temperature-corrected log K"))
 
-group.colors.prop <- c(Noentry = "#144D49", Notake = "#73C1C4", OECM = "#830342")
+ggsave("figures/Mass_corrected.pdf",height = 210, width = 297, units = "mm")
 
-pal <- wes_palette("Zissou1", 4, type = "continuous")
-ggplot() +
-  geom_map(data = WorldData, map = WorldData,
-           aes(x = long, y = lat, group = group, map_id=region,fill = MarineEcosystemDependency),
-           colour = "black", size=0.2) +
-  scale_fill_gradientn(colours = pal, na.value = "lightgrey") +
-  geom_point(data = RLS_proposed, size = 3, alpha = 0.6, aes(x=SiteLongitude, y= SiteLatitude, colour=Prop))+
-  scale_color_manual(values=group.colors.prop, labels = c("No entry", "No take", "OECM/IUCN"))+
-  theme_void()+
-  theme(plot.background = element_rect(color="white"))+
-  coord_map("rectangular", lat0=0, xlim=c(-180,180), ylim=c(-60, 90))+
-  labs(fill = "Marine ecosystem dependency",
-      color = "Proposed Management")
 
-ggsave("figures/Managementmap.pdf", width = 24.00, height = 15.75, units= "in",dpi= 600)
-ggsave("figures/Managementmap.png", width = 24.00, height = 15.75, units= "in",dpi= 600)
 
+ggsave("figures/Temperature_corrected.pdf",height = 120, width = 297, units = "mm")
+
+
+(p.temperature.adjusted = ggplot(MTE_fam, aes(x=logMmax, y=TempStandardLogK)) +
+  geom_point(size=1,aes(colour=Family)) +
+  scale_colour_manual(values = coli)+
+  labs(title="logMmax predictor effect", x="logMmax",y="Temperature-adjusted logK") +
+  geom_segment(aes(x=MinlogMmax, xend=MaxlogMmax, 
+                   y=Intercept + SlopeLogMmax*MinlogMmax + SlopeInvTkbFixe*MeanInvTkb, 
+                   yend=Intercept + SlopeLogMmax*MaxlogMmax + SlopeInvTkbFixe*MeanInvTkb,
+                   size="Family (random effect)",colour=Family)) +
+  geom_segment(aes(x=MinlogMmaxFixe, xend=MaxlogMmaxFixe,
+                   y=InterceptFixe + SlopelogMmaxFixe*MinlogMmaxFixe + SlopeInvTkbFixe*MeanInvTkb, 
+                   yend=InterceptFixe + SlopelogMmaxFixe*MaxlogMmaxFixe+ SlopeInvTkbFixe*MeanInvTkb,
+                   size="Fish in general (fixed effect)"),colour="black") +
+  scale_size_manual(name="Predictions", values=c("Family (random effect)"=0.7, "Fish in general (fixed effect)"=1.2))+
+  theme_bw(base_size=10) +
+  theme(
+    plot.title = element_text(color="black", size=25, face="bold.italic",hjust=0.5),
+    axis.title.x = element_text(color="black", size=14, face="bold"),
+    axis.title.y = element_text(color="black", size=14, face="bold")
+  ))
+
+# make the mass-corrected (growth is corrected at a mean mass) plot
+
+(p.mass.adjusted = ggplot(MTE_fam, aes(x=InvTkb, y=MassStandardLogK, colour=Family)) +
+  geom_point(size=1) +
+  scale_colour_manual(values = coli) +
+  labs(title="InvTkb predictor effect", x="InvTkb",y="Mass-adjusted logK") +
+  geom_segment(aes(x=MinInvTkb, xend=MaxInvTkb, y=Intercept + SlopeInvTkb*MinInvTkb + SlopelogMmaxFixe*MeanlogMmax, 
+                   yend=Intercept + SlopeInvTkb*MaxInvTkb + SlopelogMmaxFixe*MeanlogMmax,size="Family (random effect)")) +
+  geom_segment(aes(x=MinInvTkbFixe, xend=MaxInvTkbFixe, 
+                   y=InterceptFixe + SlopeInvTkbFixe*MinInvTkbFixe + SlopelogMmaxFixe*MeanlogMmax, 
+                   yend=InterceptFixe + SlopeInvTkbFixe*MaxInvTkbFixe+ SlopelogMmaxFixe*MeanlogMmax,
+                   size="Fish in general (fixed effect)"),colour="black") +
+  scale_size_manual(name="Predictions", values=c("Family (random effect)"=0.7, "Fish in general (fixed effect)"=1.2))+
+  theme_bw(base_size=10) +
+  theme(
+    plot.title = element_text(color="black", size=25, face="bold.italic",hjust=0.5),
+    axis.title.x = element_text(color="black", size=14, face="bold"),
+    axis.title.y = element_text(color="black", size=14, face="bold")
+  ))
+
+# 
+# 
+# #Prepping SAU Data
+# SAU_Data = resSAU_raw_2021 %>%
+#   group_by(eez_Name, sector_type_name,year) %>%
+#   summarise(sum = sum(catch_sum)) %>%
+#   summarise(summean = mean(sum)) %>%
+#   ungroup() %>%
+#   rename(Country = "eez_Name")%>%
+#   mutate(Country = as.character(Country)) 
+# 
+# #Correcting specific countries
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Costa_Rica")==T] = "Costa Rica" 
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Panama")==T] = "Panama" 
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Mexico")==T] = "Mexico" 
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Spain")==T] = "Spain" 
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Indonesia")==T] = "Indonesia" 
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Nicaragua")==T] = "Nicaragua" 
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Timor")==T] = "East Timor"
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Turk")==T] = "Turks and Caicos Islands"
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Marshall")==T] = "Republic of the Marshall Islands"
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Papua")==T] = "Papua New Guinea"
+# SAU_Data$Country[str_detect(SAU_Data$Country,"French_Polynesia")==T] = "French Polynesia"
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Pitcairn")==T] = "Pitcairn Islands"
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Chile")==T] = "Chile"
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Solomon")==T] = "Solomon Islands"
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Japan")==T] = "Japan"
+# SAU_Data$Country[str_detect(SAU_Data$Country,"American_Samoa")==T] = "American Samoa"
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Cook_Islands")==T] = "Cook Islands"
+# SAU_Data$Country[str_detect(SAU_Data$Country,"Egypt")==T] = "Egypt"
+# 
+# SAU_Final = SAU_Data %>%
+#   group_by(Country,sector_type_name) %>%
+#   summarise(Catch = mean(summean))
+# 
+# save(SAU_Final,file="outputs/SAU_final.Rdata")
+# 
+# data(pop)
+# 
+# country_pop = pop %>%
+#   rename(Country = "name") %>%
+#   dplyr::rename(pop="2020") %>%
+#   dplyr::select(c(Country,pop))
+# 
+# #Merging SAU with our data
+# RLS_Management_SAU = RLS_Management %>%
+#   left_join(SAU_Final, by = "Country") %>%
+#   filter(Class == "transition" | Class == "partial") %>%
+#   filter(Effectiveness == "No_Mpa") %>%
+#   pivot_wider(names_from = sector_type_name,values_from = Catch) %>%
+#   left_join(country_pop,by="Country") %>%
+#   mutate(Catch_ratio = (Artisanal + Subsistence)/Industrial,
+#          Catch_pop = (Subsistence)/pop,
+#          logCatch = log(Catch_pop) + min(Catch_pop, na.rm = T)) %>%
+#   mutate(stdgrav= log(gravtot2) + min(gravtot2,na.rm = T)) %>%
+#   mutate(Category = as.factor(ifelse(stdgrav < -5 & logCatch < -1,'IUCN1',ifelse(stdgrav < 3 & logCatch < 1, "IUCN2",ifelse(stdgrav < 6 & logCatch<  2.5, "IUCN3","IUCN")))))
+# 

@@ -28,10 +28,10 @@ data_prep <- function(data){
                   Family = as.factor(Family),
                   Diet = as.factor(Diet)) %>%
     na.omit()%>%
-    filter(Family !="Apogonidae") %>%
-    filter(!(Family == "Gobiidae" & K == 2.482)) %>%
-    filter(!(Family == "Pomacentridae" & K == 4)) %>%
-    filter(!(Species == "Salarias patzneri"))%>%
+    # filter(Family !="Apogonidae") %>%
+    # filter(!(Family == "Gobiidae" & K == 2.482)) %>%
+    # filter(!(Family == "Pomacentridae" & K == 4)) %>%
+    # filter(!(Species == "Salarias patzneri"))%>%
     dplyr::mutate(Species = stringr::str_replace(Species, " ", "_"))
   
   return(data_prepped)

@@ -14,6 +14,7 @@ predict_K <- function(data_prod,gen_model,fam_model,fish_model){
   
   `%notin%` <- Negate(`%in%`)
   data_prod$K_pred <- NA
+  data_prod$pred_type <- NA
   
   for (i in 1:nrow(data_prod)){
     
@@ -23,7 +24,9 @@ predict_K <- function(data_prod,gen_model,fam_model,fish_model){
       
       data_prod$K_pred[i] = data_prod$K_growth[i] * exp((-0.3839812/8.62e-05)*
                                                           ((1/(data_prod$sstmean_growth[i]))
-                                                           -(1/(data_prod$Temperature[i]+237.5))))}
+                                                           -(1/(data_prod$Temperature[i]+237.5))))
+    
+      data_prod$pred_type[i] = "Species"}
     
     else if (is.na(data_prod$K_growth[i]) & data_prod$Genus[i] %in% gen_model$Genus)  { 
       
@@ -31,13 +34,19 @@ predict_K <- function(data_prod,gen_model,fam_model,fish_model){
       
       data_prod$K_pred[i] = exp(sub_gen$Intercept) * data_prod$Mmax[i]**(sub_gen$SlopeLogMmax)*exp(sub_gen$SlopeInvTkb/(8.62e-05*(data_prod$Temperature[i]+237.5))) 
       
+      data_prod$pred_type[i] = "Genus"
+      
     }  else if(is.na(data_prod$K_growth[i]) & data_prod$Genus[i] %notin% gen_model$Genus & data_prod$Family[i] %in% fam_model$Family)  { 
       
       sub_fam <-subset(fam_model,fam_model$Family == data_prod$Family[i])
       
       data_prod$K_pred[i] = exp(sub_fam$Intercept) * data_prod$Mmax[i]**(sub_fam$SlopeLogMmax)*exp(sub_fam$SlopeInvTkb/(8.62e-05*(data_prod$Temperature[i]+237.5))) 
       
+      data_prod$pred_type[i] = "Family"
+      
     }  else { data_prod$K_pred[i] = exp(fish_model$Intercept[1]) * data_prod$Mmax[i]**(fish_model$SlopeLogMmax[1])*exp((fish_model$SlopeInvTkb[1]/(8.62e-05*(data_prod$Temperature[i]+237.5))))
+    
+     data_prod$pred_type[i] = "Fish"
     }
     
   }
