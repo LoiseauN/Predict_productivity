@@ -1,7 +1,12 @@
+#' Relationship between each covariate and the management classes 
+#' 
+#' @param prod_data output from the data_management function
+#' @param modeloutput output from the test_model function
+#' 
+#' @return plots representing the interaction between each covariate and the management class
+#' 
 
 model_prob = function(prod_data,modeloutput){
-  
-  prod_data = RLS_Management
   
   #Selecting covariables of interest
   data_formodel = prod_data %>%
@@ -81,10 +86,6 @@ model_prob = function(prod_data,modeloutput){
   
   var_probs_flat = var_probs %>% flatten()
   
-  # var_probs_flat[6] = NULL
-  # var_probs_flat[14] = NULL
-  # var_probs_flat[13] = NULL 
-  
   setwd(here())
   
   save(var_probs_flat,file="outputs/var_probs_flat.RData")
@@ -116,7 +117,5 @@ model_prob = function(prod_data,modeloutput){
   
   ggsave("figures/Figure4_4.pdf",height=210,width=297,units="mm")
   ggsave("figures/Figure4_4.png",height=210,width=297,units="mm")
-  
-  beep(sound=3)
-  
+
 }  

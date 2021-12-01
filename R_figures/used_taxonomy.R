@@ -1,13 +1,12 @@
-#' Pooling productivity and biomass by transect
+#' Table of taxonomy used in this study
 #' 
-#' @param prod_data data to pool
+#' @param data_prod Community level information for the 3714 transects
 #' 
 #' 
-#' @return data with productivity biomass for each transect
-#' @export
+#' @return Table with taxonomy information used in this study
 #' 
 
-SuppTable1 = function(data_prod){
+used_taxonomy = function(data_prod){
   
   data_family_genus = data_prod %>%
     dplyr::select(Family,Genus)%>%

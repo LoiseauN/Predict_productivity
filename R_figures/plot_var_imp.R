@@ -1,10 +1,8 @@
-#' Pooling productivity and biomass by transect
+#' Variable importance plot of our random forest model - the mean over 100 iterations
 #' 
 #' @param model_test_output the output from the test_model function
 #' 
-#' 
-#' @return data with productivity biomass for each transect
-#' @export
+#' @return plot representing mean variable importance of our random forest model over 100 iterations
 #' 
 
 

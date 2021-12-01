@@ -1,14 +1,12 @@
-#' Pooling productivity and biomass by transect
+#' Correlation between variables - biomass, biomass production and productivity - and correlation levels
 #' 
-#' @param prod_data data to pool
+#' @param data_transect output of data_management function
 #' 
 #' 
-#' @return data with productivity biomass for each transect
-#' @export
+#' @return plot with pearson correlation between all variables + R value 
 #' 
 
 plot_metrics_comparison = function(data_transect){
-
 
   prod_biom_lm = cor(data_transect$log10Prod,data_transect$log10Biom,method="pearson")
   pvalue1 = cor.test(data_transect$log10Prod,data_transect$log10Biom,method="pearson")$p.value

@@ -1,10 +1,9 @@
-#' Pooling productivity and biomass by transect
+#' Mapping management classes for all transects in the world
 #' 
-#' @param prod_data data with management classes to plot
+#' @param data_prod output from the data_management function
 #' 
 #' 
-#' @return data with productivity biomass for each transect
-#' @export
+#' @return One figure of world map for each management class and one confounding all classes on one map
 #' 
 
 map_management <- function(data_prod){
@@ -81,13 +80,10 @@ map_management <- function(data_prod){
                          legend.text= element_text(size=40))+
     guides(colour = guide_legend(override.aes = list(size=10)))
   
-  ggsave(plot_transition, file = "figures/Maps.pdf",width = 24.00, height = 15.75, units= "in",dpi= 600)
+  ggsave(plot_transition, file = "figures/map_transition.pdf",width = 24.00, height = 15.75, units= "in",dpi= 600)
   
   ggarrange(plot_pristine,plot_partial, plot_deadzone,plot_transition,common.legend=T, font.label = list(size = 14, color = "black", face = "bold", family = NULL))
   
   ggsave(file = "figures/Maps.pdf",width = 24.00, height = 15.75, units= "in",dpi= 600)
-  
-  
-  beep(sound=4)
   
 }

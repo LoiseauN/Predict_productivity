@@ -1,12 +1,10 @@
-#' Pooling productivity and biomass by transect
+#' Plotting various representations of our biplot of biomass/productivity
 #' 
-#' @param prod_data data with management classes to plot
+#' @param data_prod output from the data_management function
 #' 
-#' 
-#' @return data with productivity biomass for each transect
-#' @export
-#'
-data_prod = RLS_Management
+#' @return Classic biplot used in figure 1, biplot according to protection status, and biplot according to gravity/marine ecosystem dependency used in Figure 4
+
+
 plot_classes <- function(data_prod){
   
   biom75 = quantile(data_prod$log10Biom,0.95)
