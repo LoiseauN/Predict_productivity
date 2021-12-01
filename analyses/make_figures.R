@@ -1,35 +1,9 @@
-#-----------------Loading packages-------------------
 
-pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot","rnaturalearth","plotly","ggridges","ggbeeswarm","ggforce","rfishbase",
-          "parameters","NbClust","cluster","klaR","beepr","gstat",
-          "harrypotter","wesanderson","dichromat","ranger","ggpubr","data.table","pdp","png","sf","broom.mixed","arm","fishualize","wpp2019","gridExtra","ggpubr","scales","magrittr","hrbrthemes")
-nip <- pkgs[!(pkgs %in% installed.packages())]
-nip <- lapply(nip, install.packages, dependencies = TRUE)
-ip   <- unlist(lapply(pkgs, require, character.only = TRUE, quietly = TRUE))
-
-#----------------Loading results------------------------
-
-path = (here::here("data"))
-setwd(path)
-files <- list.files(here::here("data"),pattern = ".RData|.Rdata")
-data_list = lapply(files, load, .GlobalEnv)
+#' Function to run all the functions needed to make figures for paper
+#' 
 
 
-path = (here::here("outputs"))
-setwd(path)
-files <- list.files(here::here("outputs"),pattern = ".RData|.Rdata")
-data_list = lapply(files, load, .GlobalEnv)
-
-#-------------Loading code for plots---------------
-
-path = (here::here("R_figures"))
-setwd(path)
-files.source = list.files(here::here("R_figures"))
-sapply(files.source, source)
-
-#-------------Plots--------------------------------
-
-setwd(here())
+predict_productivity = function(){
 
 #We need these dataframes for some figures
 #Productivity at commmunity level but only for kept transects
@@ -67,6 +41,10 @@ model_prob(RLS_Management,model_test)
 #MTE plots
 plot_MTE(data_prepped, fam_model_K)
 
+#K observed versus predicted
+K_observed_predicted(data_prepped)
+
+}
 
 # 
 # (p.temperature.adjusted = ggplot(MTE_fam, aes(x=logMmax, y=TempStandardLogK)) +

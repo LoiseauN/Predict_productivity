@@ -1,17 +1,9 @@
-#' Run the Entire Project
-#'
-#' This script reproduces all analyses and figures of the ___________ article.
-#'
-#' @author Raphaël SEGUIN, \email{raphael.seguin46@@gmail.com},
-#'         Nicolas LOISEAU, \email{nicolas.loiseau1@@gmail.com},
-#'
-#' @date 2021/02/17
-#' 
-
 #-----------------Loading packages-------------------
 
-pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot",
-          "harrypotter","wesanderson","dichromat","ranger","ggpubr","data.table","pdp","png","sf")
+pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot","rfishbase","beepr",
+          "rnaturalearth","plotly","ggridges","ggbeeswarm","ggforce","rfishbase",
+          "parameters","NbClust","cluster","klaR","beepr","gstat",
+          "harrypotter","wesanderson","dichromat","ranger","ggpubr","data.table","pdp","png","sf","broom.mixed","arm","performance","see")
 nip <- pkgs[!(pkgs %in% installed.packages())]
 nip <- lapply(nip, install.packages, dependencies = TRUE)
 ip   <- unlist(lapply(pkgs, require, character.only = TRUE, quietly = TRUE))
@@ -23,6 +15,18 @@ setwd(path)
 files <- list.files(here::here("data"),pattern = ".RData")
 data_list = lapply(files, load, .GlobalEnv)
 
+socio <- readRDS(file="RLS_socio_withoutNA.rds")
+env   <- readRDS(file="RLS_env_spatio_temporal.rds")
+mpa   <- readRDS(file="RLS_mpa.rds")
+colnames(mpa)[1] <- "SurveyID"
+
+#----------------Loading results------------------------
+
+path = (here::here("outputs"))
+setwd(path)
+files <- list.files(here::here("outputs"),pattern = ".RData")
+data_list = lapply(files, load, .GlobalEnv)
+
 #-----------------Loading all functions---------------------
 
 path = (here::here("R"))
@@ -30,83 +34,21 @@ setwd(path)
 files.source = list.files(here::here("R"))
 sapply(files.source, source)
 
-#------------Load plot functions-----------------
+path = (here::here("R_figures"))
+setwd(path)
+files.source = list.files(here::here("R_figures"))
+sapply(files.source, source)
 
+#----------------Run project------------------------
 
-
-#----------------Load SHP-------------
-
-nc_map = st_read("shp/NewCaledonia_v7.shp")
-
-#----------------Run code------------------------
+path = (here::here("analyses"))
+setwd(path)
+files.source = list.files(here::here("analyses"))
+sapply(files.source, source)
 
 setwd(here())
 
-growth_data_prep = data_prep(growth_data)
+predict_growth()
 
-#converting temperature from sst to kelvin
-data_prod = data_prod %>%
-  mutate(sst = sst+273.5)
 
-#Testing model performances at predicting growth rates K based on mean adjusted R squared over 100 iterations
-
-#We should keep Diet here
-fam_perf = K_fam_perf(growth_data_prep)
-fam_diet_perf = K_fam_diet_perf(growth_data_prep)
-
-#We should keep Diet here
-gen_perf = K_gen_perf(growth_data_prep)
-gen_diet_perf = K_gen_diet_perf(growth_data_prep)
-
-#Getting some plots
-plot_fam_perf(growth_data_prep)
-plot_gen_perf(growth_data_prep)
-
-#Testing Linf predictions model performance
-Linf_fam_perf =   Linf_fam_perf(growth_Linf)
-Linf_gen_perf = Linf_gen_perf(growth_Linf)
-
-#Saving models
-fam_model_K = save_fam_model_K(growth_data_prep)
-gen_model_K = save_gen_model_K(growth_data_prep)
-fish_model_K = save_fish_model_K(growth_data_prep)
-fam_model_Linf = save_fam_model_Linf(growth_Linf)
-gen_model_Linf = save_gen_model_Linf(growth_Linf)
-fish_model_Linf = save_fish_model_Linf(growth_Linf)
-
-#Predicting K and Linf
-data_merged = merge_growth(growth_data_prep,data_prod,gen_model_K)
-data_K = predict_K(data_merged,gen_model_K,fam_model_K,fish_model_K)
-data_final = predict_Linf(data_K,fam_model_Linf,gen_model_Linf,fish_model_Linf)
-
-data_final = data_prod %>%
-  dplyr::rename(Size = "Taille")
-
-#Calculating productivity
-NC_prod = calc_prod(data_final,500)
-
-#Pooling by transect
-NC_transect = prod_pool(NC_prod)
-
-#Plot K by size
-K_by_size(NC_prod)
-
-#Protection classes
-NC_management = data_management(NC_transect)
-
-#Plot map and classes
-plot_classes(NC_management)
-map_management(NC_management,nc_map)
-
-#Prepping covariates
-NC_covariates = data_covariates(NC_management)
-
-#Modelling
-model_test = test_model(NC_covariates)
-
-#Plotting some model stuff
-plot_var_imp(model_test)
-
-#Getting plot probabilities
-model_prob(NC_covariates)
 

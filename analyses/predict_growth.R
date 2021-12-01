@@ -1,41 +1,11 @@
-#-----------------Loading packages-------------------
+#' Function to run all the functions needed to predict growth and Linf
+#' 
 
-pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot","rfishbase","beepr",
-          "harrypotter","wesanderson","dichromat","ranger","ggpubr","data.table","pdp","png","sf","broom.mixed","see")
-nip <- pkgs[!(pkgs %in% installed.packages())]
-nip <- lapply(nip, install.packages, dependencies = TRUE)
-ip   <- unlist(lapply(pkgs, require, character.only = TRUE, quietly = TRUE))
 
-#-----------------Loading all data---------------------
-
-path = (here::here("data"))
-setwd(path)
-files <- list.files(here::here("data"),pattern = ".RData|.Rdata")
-data_list = lapply(files, load, .GlobalEnv)
-
-socio <- readRDS(file="RLS_socio_withoutNA.rds")
-env   <- readRDS(file="RLS_env_spatio_temporal.rds")
-mpa   <- readRDS(file="RLS_mpa.rds")
-colnames(mpa)[1] <- "SurveyID"
-
-path = (here::here("outputs"))
-setwd(path)
-files <- list.files(here::here("outputs"),pattern = ".RData|.Rdata")
-data_list = lapply(files, load, .GlobalEnv)
-
-#-----------------Loading all functions---------------------
-
-path = (here::here("R"))
-setwd(path)
-files.source = list.files(here::here("R"))
-sapply(files.source, source)
-
-#---------------Test models and predict K and Linf-----------
-
-setwd(here())
+predict_growth = function(){
 
 #Prepping data, removing some errors 
-data_growth = Morais %>% 
+data_growth = growth_database %>% 
   dplyr::select(Family,Species,MaxSizeTL,Diet,a,b,Linf,K,sstmean) %>%
   rename(MaxSize = "MaxSizeTL") %>%
   mutate(Genus = word(Species,1)) %>%
@@ -53,15 +23,23 @@ save(data_prepped, file ="outputs/data_prepped.RData")
 
 #At family level
 fam_perf = K_fam_perf(data_prepped)
+print(fam_perf)
+save(fam_perf, file = "outputs/fam_perf.Rdata")
 
 #At genus level
 gen_perf = K_gen_perf(data_prepped)
+print(gen_perf)
+save(gen_perf, file = "outputs/gen_perf.Rdata")
 
 #Testing Linf predictions model performance
 #For this we combined the base dataset with another growth dataset
-
 Linf_fam_perf =   Linf_fam_perf(growth_Linf)
+print(Linf_fam_perf)
+save(Linf_fam_perf, file = "outputs/Linf_fam_perf.Rdata")
+
 Linf_gen_perf = Linf_gen_perf(growth_Linf)
+print(Linf_gen_perf)
+save(Linf_gen_perf, file = "outputs/Linf_gen_perf.Rdata")
 
 #Saving models
 fam_model_K = save_fam_model_K(data_prepped)
@@ -80,30 +58,14 @@ data_merged = merge_growth(data_prepped,RLS_fish,gen_model_K)
 
 #Predicting K using MTE
 data_K = predict_K(data_merged,gen_model_K,fam_model_K,fish_model_K)
+print(head(data_K))
 
 #Predicting Linf using MTE
 data_final = predict_Linf(data_K_final,fam_model_Linf,gen_model_Linf,fish_model_Linf)
+print(head(data_final))
 
 save(data_final, file = "outputs/data_final.Rdata")
 
 
-#Quick figure to plot K observed versus K predicted
-#For testing with intial database 
-data_merged = data_prepped %>%  mutate(K_growth = NA) %>% rename(Temperature = "sstmean") %>% mutate(Temperature = Temperature - 237.5)
 
-data_K = predict_K(data_merged,gen_model_K,fam_model_K,fish_model_K)
-
-data_plot = data_K %>%
-  pivot_longer(c(K,K_pred))%>%
-  mutate(value = log(value+1))
-
-ggplot(data_plot,aes(value,fill=name))+
-  geom_density(alpha = 0.6)+
-  scale_fill_manual(labels = c("Observed K","Predicted K"), values = c("#1E72A6","#FDDA26"))+
-  theme(panel.grid.major = element_blank(), panel.grid.minor = element_blank(),
-        panel.background = element_blank(), axis.line = element_line(colour = "black"))+
-  labs(x = "Growth rate",
-       y=  "Density")+
-  guides(fill = guide_legend(title="Growth rate"))
-
-ggsave("figures/PredictedObservedK.pdf",width = 297, height = 210,unit="mm")
+}

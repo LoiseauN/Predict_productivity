@@ -1,42 +1,11 @@
-#-----------------Loading packages-------------------
 
-pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot","beepr",
-          "harrypotter","wesanderson","dichromat","ranger","ggpubr","data.table","pdp","png","sf","broom.mixed","arm","performance")
-nip <- pkgs[!(pkgs %in% installed.packages())]
-nip <- lapply(nip, install.packages, dependencies = TRUE)
-ip   <- unlist(lapply(pkgs, require, character.only = TRUE, quietly = TRUE))
+#' Function to run all the functions needed to predict productivity
+#' 
 
-#-----------------Loading all data---------------------
 
-path = (here::here("data"))
-setwd(path)
-files <- list.files(here::here("data"),pattern = ".RData")
-data_list = lapply(files, load, .GlobalEnv)
+predict_productivity = function(){
 
-socio <- readRDS(file="RLS_socio_withoutNA.rds")
-env   <- readRDS(file="RLS_env_spatio_temporal.rds")
-mpa   <- readRDS(file="RLS_mpa.rds")
-colnames(mpa)[1] <- "SurveyID"
-
-#----------------Loading results------------------------
-
-path = (here::here("outputs"))
-setwd(path)
-files <- list.files(here::here("outputs"),pattern = ".RData")
-data_list = lapply(files, load, .GlobalEnv)
-
-#-----------------Loading all functions---------------------
-
-path = (here::here("R"))
-setwd(path)
-files.source = list.files(here::here("R"))
-sapply(files.source, source)
-
-#--------Run analyses for productivity-----------------------
-
-setwd(here())
-
-# #Calculating productivity
+#Calculating productivity
 RLS_prod_all = calc_prod(data_final)
         
 save(RLS_prod_all, file = "outputs/RLS_prod_all.RData")
@@ -61,7 +30,7 @@ model_test = test_model(RLS_Management)
 save(model_test, file ="outputs/model_test.RData")
 
 
-
+}
 
 
 
