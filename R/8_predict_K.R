@@ -1,11 +1,11 @@
 #' Predicting K using MTE 
 #' 
-#' @param prod_data data to predict productivity on
+#' @param prod_data data to predict productivity on, outptut from the merge_growth function
 #' @param gen_model the output from the save_gen_model_K function
 #' @param fam_model the output from the save_fam_model_K function
 #' @param fish_model the output from the fish_model_K function
 #' 
-#' @return dataframe with performance of each model
+#' @return dataframe with predicted K 
 #' @export
 #' 
 
@@ -50,6 +50,9 @@ predict_K <- function(data_prod,gen_model,fam_model,fish_model){
     }
     
   }
+  
+  data_prod = data_prod %>%
+    mutate(K_pred = ifelse(!is.na(K_growth),K_pred/10,K_pred))
   
 return(data_prod)  
 

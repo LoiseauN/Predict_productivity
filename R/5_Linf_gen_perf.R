@@ -1,11 +1,10 @@
 #' Testing models for the prediction of Tinf 
 #'
-#' This function preps your data for necessary parameters for MTE 
+#' This function does 100 iterations of the model to predict Linf and gives model performance
 #'
-#' @param growth_data the output from the data_prep function 
+#' @param growth_Linf the output from the data_prep function + added data
 #' 
-#' @return dataframe with performance of each model
-#' @export
+#' @return dataframe with performance of model
 #' 
 #' 
 

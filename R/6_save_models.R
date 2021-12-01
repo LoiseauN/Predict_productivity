@@ -1,15 +1,17 @@
-#' Testing models for the prediction of K growth rates at family level
+#' Range of functions to save prediction models
 #'
-#' This function preps your data for necessary parameters for MTE 
+#' These functions save all the models to predict K and Linf
 #'
 #' @param growth_data the output from the data_prep function 
+#' OR
+#' @param growth_Linf the output from data_prep function + added data
 #' 
 #' @return dataframe with performance of each model
 #' @export
 #' 
 #' 
 
-growth_data = data_prepped
+
 save_fam_model_K <- function(growth_data){
   
   fam_model <- lmer(logK~logMmax+InvTkb + (1+logMmax|Family),growth_data,

@@ -1,11 +1,10 @@
 #' Testing models for the prediction of K growth rates at family level
 #'
-#' This function preps your data for necessary parameters for MTE 
-#'
+#' This iterates the model to predict growth rates at family levels 100 times and gives mean performance
+#' 
 #' @param growth_data the output from the data_prep function 
 #' 
-#' @return dataframe with performance of each model
-#' @export
+#' @return dataframe with performance of model
 #' 
 #' 
 

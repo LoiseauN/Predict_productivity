@@ -3,8 +3,9 @@
 #' @param prod_data data to predict productivity on
 #' @param gen_model the output from the gen_model_Linf function
 #' @param fam_model the output from the fam_model_Linf function
+#' @param fish_model_Linf the output from the fish_model_Linf function
 #' 
-#' @return dataframe with performance of each model
+#' @return dataframe with predicted Linf
 #' @export
 #' 
 
@@ -36,7 +37,5 @@ for (i in 1:nrow(data_prod)){
   
   
   return(data_prod)
-  
-  save(data_prod,file="outputs/data_final.RData")
   
 }

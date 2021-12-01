@@ -1,10 +1,9 @@
-#' Pooling productivity and biomass by transect
+#' This function does 100 iterations of the random forest model to check its performance in predicting management class
 #' 
-#' @param prod_data data to pool
+#' @param prod_data output from data_management function
 #' 
 #' 
-#' @return data with productivity biomass for each transect
-#' @export
+#' @return dataframe with variable importance and model performance
 #' 
 
 
@@ -64,30 +63,9 @@ preds = ranger_loop %>%
   map_dbl(mean)%>%
   as_tibble(rownames=NA)
 
-#GETTING BALANCED ACCURACY FROM ITERATIONS
-
-# #Getting balanced accuracy from output list
-# preds_class = ranger_loop %>%
-#   #Transfomring list into large dataframe
-#   flatten_df() %>%
-#   #Recuperating column names
-#   unnest(cols=c())%>%
-#   #Keeping only variables and their importance
-#   dplyr::select(Balanced_Accuracy)%>%
-#   na.omit()%>%
-#   mutate(class = rep(c("deadzone","partial","pristine","transition"),100))%>%
-#   group_by(class)%>%
-#   dplyr::summarize(Balanced_Accuracy=mean(Balanced_Accuracy))
-
 output = list(data.frame(rel_inf),
               data.frame(preds))
-              # data.frame(preds_class))
-
-beep(sound=4)
 
 return(output)
-
-
-
 
 }

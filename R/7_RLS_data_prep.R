@@ -1,11 +1,11 @@
-#' Predicting Linf
+#' CLeaning Reef Life Survey database
 #'
-#' @param prod_data data to predict productivity on
-#' @param gen_model the output from the gen_model_Linf function
-#' @param fam_model the output from the fam_model_Linf function
+#' @param fish species data for RLS
+#' @param traits traits data for RLS
+#' @param coef growth data for RLS
+#' @param env environmental data for RLS
 #' 
-#' @return dataframe with performance of each model
-#' @export
+#' @return RLS data with everything we need for our study
 #' 
 
 RLS_data_prep <- function(RLS_data,Traits_data,Coef_data,Env_data){

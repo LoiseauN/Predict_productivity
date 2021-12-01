@@ -3,11 +3,10 @@
 #' Here we merge K of growth data into our dataset for species thate are present in BOTH datasaets 
 #'
 #' @param growth_data output from the data_prep function 
-#' @param prod_data data to predict productivity on
+#' @param prod_data output from the RLS_data_prep function
 #' @param gen_model the output from the save_gen_model_K function
 #' 
-#' @return dataframe with performance of each model
-#' @export
+#' @return dataframe  with closest temperature compared to growth database and parameters we need to predict K 
 #' 
 #' 
 

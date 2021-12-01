@@ -1,10 +1,11 @@
-#' Pooling productivity and biomass by transect
+#' Prepping data with covariates, keeping only transects for coral reefs
 #' 
-#' @param prod_data data to pool
+#' @param data_prod output from the calc_prod_transect function
+#' @param env_data environmental data for RLS
+#' @param mpa_data mpa data for RLS
+#' @param socio_data socio-economic data for RLS
 #' 
-#' 
-#' @return data with productivity biomass for each transect
-#' @export
+#' @return data at transect levels with covariates etc
 #' 
 
 
@@ -18,7 +19,7 @@ data_covariates <- function(data_prod,env_data,mpa_data,socio_data){
     #Keeping tropical only
     filter(min_sst_5year > 17) %>% 
     #Selecting variables of interest
-    dplyr::select(SurveyID,Depth,mean_sst_5year,gravtot2,mean_chl_5year,mean_npp_5year,
+    dplyr::select(SurveyID,Depth,mean_sst_5year,gravtot2,mean_npp_5year,
                   mean_pH_1year_5year,mean_DHW_5year,NoViolence,ControlofCorruption,
                   Voice,HDI,MarineEcosystemDependency,Depth,NGO,Effectiveness,log10ProdB,log10Prod,log10Biom,SiteLatitude,SiteLongitude,Country)
   

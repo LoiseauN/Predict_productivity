@@ -1,9 +1,9 @@
 #' Calculating productivity
 #' 
-#' @param prod_data data to predict productivity on
-#' @param area transect area
-#' @return dataframe with performance of each model
-#' @export
+#' @param data_prod Output from the predict_Linf function, with K and Linf predcited
+#' 
+#' 
+#' @return dataframe with biomass/biomass production/productivity calculated for all communities in RLS data base
 #' 
 
 calc_prod <- function(data_prod){
@@ -13,7 +13,7 @@ calc_prod <- function(data_prod){
     #If observed size is higher than the maximum reported size, then replace observed size with maximum size
     mutate(Sizeclass = ifelse(Sizeclass>MaxLength,MaxLength,Sizeclass))
     #If observed size is higher than Linf, then we replace Linf with maximum size
-    # mutate(Linf = ifelse(Sizeclass>Linf_pred,MaxLength,Linf_pred))
+    mutate(Linf = ifelse(Sizeclass>Linf_pred,MaxLength,Linf_pred))
   
   data_with_prod = data_forprod %>%
     #Calculating production

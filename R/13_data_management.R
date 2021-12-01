@@ -1,10 +1,12 @@
-#' Pooling productivity and biomass by transect
+#' Creating management classes for our data 
 #' 
-#' @param prod_data data to pool
+#' @param data_prod  output from the data_covariates function
+#' @param s_sup_biom upper biomass threshold
+#' @param s_inf_biom lower biomass threshold
+#' @param s_sup_prod upper productivity threshold
+#' @param s_inf_prod lower productivity threshold
 #' 
-#' 
-#' @return data with productivity biomass for each transect
-#' @export
+#' @return data with management class added
 #' 
 
 data_management <- function(data_prod,s_sup_biom,s_inf_biom,s_sup_prod,s_inf_prod){

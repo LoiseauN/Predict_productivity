@@ -1,11 +1,10 @@
 #' Testing models for the prediction of K growth rates at genus level
 #'
-#' This function preps your data for necessary parameters for MTE 
+#' This function does 100 iterations of the model at genus level to give model performance
 #'
 #' @param growth_data the output from the data_prep function 
 #' 
-#' @return dataframe with performance of each model
-#' @export
+#' @return dataframe with performance of genus model
 #' 
 #' 
 

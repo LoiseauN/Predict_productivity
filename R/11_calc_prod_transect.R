@@ -1,9 +1,9 @@
-#' Calculating productivity
+#' Aggregating productivity at transect level, and logging it 
 #' 
-#' @param prod_data data to predict productivity on
-#' @param area transect area
-#' @return dataframe with performance of each model
-#' @export
+#' @param data_with_prod Output from the calc_prod function
+#' @param transect_info transect area
+#' 
+#' @return dataframe with productivity calculated at community level
 #' 
 
 calc_prod_transect <- function(data_with_prod,transect_info){
@@ -22,9 +22,5 @@ calc_prod_transect <- function(data_with_prod,transect_info){
   data_prod_brut$SiteLongitude <- as.numeric(as.character(data_prod_brut$SiteLongitude))
   
   return(data_prod_brut)
-  
 
-  
- 
-  
 }
