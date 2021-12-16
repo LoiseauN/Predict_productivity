@@ -5,15 +5,14 @@
 #' 
 #' @return dataframe with biomass/biomass production/productivity calculated for all communities in RLS data base
 #' 
-
 calc_prod <- function(data_prod){
-  
+
   #Size corrections
   data_forprod = data_prod %>%
     #If observed size is higher than the maximum reported size, then replace observed size with maximum size
-    mutate(Sizeclass = ifelse(Sizeclass>MaxLength,MaxLength,Sizeclass))
+    dplyr::mutate(Sizeclass = ifelse(Sizeclass>MaxLength,MaxLength,Sizeclass)) %>%
     #If observed size is higher than Linf, then we replace Linf with maximum size
-    mutate(Linf = ifelse(Sizeclass>Linf_pred,MaxLength,Linf_pred))
+    dplyr::mutate(Linf = ifelse(Sizeclass>Linf_pred,MaxLength,Linf_pred))
   
   data_with_prod = data_forprod %>%
     #Calculating production

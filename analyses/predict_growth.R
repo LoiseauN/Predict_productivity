@@ -61,11 +61,10 @@ data_K = predict_K(data_merged,gen_model_K,fam_model_K,fish_model_K)
 print(head(data_K))
 
 #Predicting Linf using MTE
-data_final = predict_Linf(data_K_final,fam_model_Linf,gen_model_Linf,fish_model_Linf)
+data_final = predict_Linf(data_K,fam_model_Linf,gen_model_Linf,fish_model_Linf)
 print(head(data_final))
 
 save(data_final, file = "outputs/data_final.Rdata")
-
 
 
 }

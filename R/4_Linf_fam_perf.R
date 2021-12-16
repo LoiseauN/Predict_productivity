@@ -8,11 +8,12 @@
 #' 
 #' 
 
-
 Linf_fam_perf <- function(growth_data){
   
   #Multiple cross validation procedures to get mean R squared model
-  test <-  mclapply(1:100,function(p){
+  test <-  lapply(1:100,function(p){
+    
+    an.error.occured <- FALSE
     
     #Split data into 80% and 20% for crossvalidation 
     
@@ -25,9 +26,12 @@ Linf_fam_perf <- function(growth_data){
     #NLME model to predict Tinf at family level
     Growth_fam <-  groupedData(K~MaxSize|Family, data= growth_data_train)
 
-    tryCatch(Growth_fam_model <-  nlme(Linf~MaxSize.fct(a,MaxSize),
-                                  data=Growth_fam,fixed=a~1,random=a~1,start=list(fixed=c(0.5)))
-             ,error = function(e) cat("Error, model didn't converge"))
+    tryCatch( { Growth_fam_model <-  nlme(Linf~MaxSize.fct(a,MaxSize),
+                                  data=Growth_fam,fixed=a~1,random=a~1,start=list(fixed=c(0.5)),control=(msMaxIter=100)) }
+             , error = function(e)
+               {an.error.occured <<- TRUE})
+    
+    if(an.error.occured) { print("Skipping to next loop...") } else {
     
     #Cleaning model parameters
     Growth_fam_model_clean <- broom.mixed::tidy(Growth_fam_model,effects="ran_coefs") %>%
@@ -44,10 +48,14 @@ Linf_fam_perf <- function(growth_data){
     
     p <- list(data.frame(loop = p,
                          rsquared = fam_perf))
+    
+    }
+    
 
   })
   
-  family_perf <- do.call(rbind,(do.call(rbind,test)))
-  family_perf = summarize(family_perf,rsquared = mean(rsquared))
+  test = test[test != "Skipping to next loop..."]
+  
+  family_perf = test %>% bind_rows() %>% summarize(rsquared = mean(rsquared))
 
 }

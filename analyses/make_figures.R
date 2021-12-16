@@ -3,7 +3,7 @@
 #' 
 
 
-predict_productivity = function(){
+make_figures = function(){
 
 #We need these dataframes for some figures
 #Productivity at commmunity level but only for kept transects

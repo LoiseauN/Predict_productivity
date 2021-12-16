@@ -8,10 +8,11 @@
 #' 
 #' 
 
+
 K_gen_perf <- function(growth_data){
   
   #Multiple cross validation procedures to get mean R squared model
-  test <-  mclapply(1:100,function(p){
+  test <-  lapply(1:100,function(p){
     
     #Split data into 80% and 20% for crossvalidation 
     
@@ -71,7 +72,6 @@ K_gen_perf <- function(growth_data){
     
   })
   
-  genus_perf <- do.call(rbind,do.call(rbind,test)) %>%
-    summarize(rsquared = mean(rsquared))
+  genus_perf = test %>% bind_rows() %>% summarize(rsquared = mean(rsquared))
   
 }
