@@ -8,27 +8,37 @@
 
 model_prob = function(prod_data,modeloutput){
   
+  prod_data = RLS_Management
+  modeloutput = test_model
+  
   #Selecting covariables of interest
   data_formodel = prod_data %>%
-    dplyr::select(-c(Country))%>%
+    dplyr::select(-c(site_code, SurveyID, No.take.multizoned, log10ProdB:Country)) %>%
     mutate(gravtot2 = log(gravtot2+1))%>%
     na.omit()
   
   #Full model and delete transition data
   mod = ranger(Class~.,data=data_formodel,mtry=3,probability = T,num.trees=1000)
   
-  var_imp = as.data.frame(modeloutput[1]) %>%
-    arrange(-percentage) %>%
-    filter(rowname != "Effectiveness") %>%
+  var_imp = model_test_output[[1]] %>%
+    #Keeping only variables and their importance
+    dplyr::select(rowname,importance.mod.)%>%
+    na.omit()%>%
+    #Getting mean variable importance over all iterations
+    dplyr::group_by(rowname)%>%
+    dplyr::summarize(importance.mod.=mean(importance.mod.))%>%
+    mutate(percentage = (importance.mod.*100)/sum(importance.mod.))%>%
+    arrange(percentage) %>%
     column_to_rownames("rowname")
   
-  var_imp$var_names = c("Human gravity","Mean NPP (over 5 years)","Mean SST (over 5 years)","Mean pH (over 5 years)","Mean DHW (over 5 years)","Human Voice","No Violence","Marine Ecosystem Dependency","Human Development Index","Depth","Control of Corruption","NGO Presence")
+  var_imp$var_names = c("NoViolence","Voices","ControlofCorruption","NGO","Effectiveness","MarineEcosystemDependency",
+                        "HDI","	mean_pH_1year_5year","Depth","mean_sst_5year","mean_DHW_5year","gravtot2","mean_npp_5year")
   
   var_probs = mclapply(rownames(var_imp),function(i){
     
     pd = NULL
     plot_list = list()
-    for (p in 1:4) {
+    for (p in 1:3) {
       tmp <- pdp::partial(mod, pred.var = c(i),
                           which.class = p, grid.resolution = 101 ,n.trees=1000)
       pd <- rbind(pd, cbind(tmp, Class = levels(prod_data$Class)[p]))
@@ -66,23 +76,13 @@ model_prob = function(prod_data,modeloutput){
            y="")+
       guides(fill=F)
     
-    transition = pd %>%
-      filter(Class=="transition")%>%
-      ggplot(aes(eval(parse(text = paste(i))),yhat))+
-      geom_point(colour="#ABDDDE",size=3,alpha=0.7)+
-      geom_smooth(se=F)+
-      theme_bw()+
-      labs(x= var_imp[i,3],
-           y="")+
-      guides(fill=F)
-    
-    (plots = ggarrange(pristine, partial, deadzone,transition, ncol = 1,nrow=4))
+    (plots = ggarrange(pristine, partial, deadzone, ncol = 1,nrow=3))
     
     plot_list[[i]] = plots
     
     return(plot_list)
     
-  }, mc.cores = 6)
+  }, mc.cores = 1)
   
   var_probs_flat = var_probs %>% flatten()
   
@@ -96,7 +96,7 @@ model_prob = function(prod_data,modeloutput){
   plot1 = var_probs_flat[1:3]
   plot2 = var_probs_flat[4:6]
   plot3 = var_probs_flat[7:9]
-  plot4 = var_probs_flat[10:12]
+  plot4 = var_probs_flat[10:13]
   
   bigplot = plot_grid(plotlist=plot1,ncol=3)
   

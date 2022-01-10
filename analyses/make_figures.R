@@ -4,14 +4,20 @@
 
 
 make_figures = function(){
+  
+#Info data 
+RLS_info = info %>%
+  dplyr::select(site_code,survey_id) %>%
+  dplyr::rename(SurveyID = "survey_id")
 
 #We need these dataframes for some figures
 #Productivity at commmunity level but only for kept transects
 RLS_prod_figures = RLS_prod_all %>%
-  filter(SurveyID %in% RLS_Management$SurveyID)
+  left_join(RLS_info, by ="SurveyID") %>%
+  filter(site_code %in% RLS_Management$site_code)
 
 RLS_prod_transect_figures = RLS_prod %>%
-  filter(SurveyID %in% RLS_Management$SurveyID)
+  filter(site_code %in% RLS_Management$site_code)
 
 #Plot figure representing K by size for each family and for some examples 
 K_plots(RLS_prod_figures)

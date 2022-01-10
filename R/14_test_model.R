@@ -8,11 +8,13 @@
 
 
 test_model <- function(prod_data){
-  
+ 
   #Selecting covariables of interest
   data_formodel = prod_data %>%
-    dplyr::select(-c(SurveyID, log10ProdB:Country)) %>%
+    dplyr::select(-c(site_code, SurveyID, No.take.multizoned, log10ProdB:Country)) %>%
     na.omit()
+    
+    colnames(data_formodel)
 
 #Running random foret a 100 times
 ranger_loop = mclapply(1:100,function(i){
@@ -35,7 +37,7 @@ ranger_loop = mclapply(1:100,function(i){
                       data.frame(Balanced_Accuracy = CM$byClass[,11]))
   return(model_varImp)
   
-},mc.cores = 3)
+},mc.cores = 1)
 
 #Getting variable importance from output list
 rel_inf = ranger_loop %>%

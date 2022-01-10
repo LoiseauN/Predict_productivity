@@ -1,6 +1,6 @@
 #-----------------Loading packages-------------------
 
-pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot","rfishbase","beepr",
+pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot","rfishbase","beepr","stars","factoextra", "magrittr",
           "rnaturalearth","plotly","ggridges","ggbeeswarm","ggforce","rfishbase","parameters","NbClust","cluster","klaR","beepr","gstat",
           "harrypotter","wesanderson","dichromat","ranger","ggpubr","data.table","pdp","png","sf","broom.mixed","arm","performance","see")
 nip <- pkgs[!(pkgs %in% installed.packages())]
@@ -11,7 +11,7 @@ ip   <- unlist(lapply(pkgs, require, character.only = TRUE, quietly = TRUE))
 
 path = (here::here("data"))
 setwd(path)
-files <- list.files(here::here("data"),pattern = ".RData")
+files <- list.files(here::here("data"),pattern = ".RData|Rdata")
 data_list = lapply(files, load, .GlobalEnv)
 
 socio <- readRDS(file="RLS_socio_withoutNA.rds")
@@ -61,6 +61,8 @@ data_list = lapply(files, load, .GlobalEnv)
 
 setwd(here())
 
+world = ne_countries(scale = "small", returnclass = "sf")
+world = st_transform(world, "+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
 
 #Making all the figures for the paper
 make_figures()
