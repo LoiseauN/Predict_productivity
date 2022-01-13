@@ -31,8 +31,9 @@ model_prob = function(prod_data,modeloutput){
     arrange(percentage) %>%
     column_to_rownames("rowname")
   
-  var_imp$var_names = c("NoViolence","Voices","ControlofCorruption","NGO","Effectiveness","MarineEcosystemDependency",
-                        "HDI","	mean_pH_1year_5year","Depth","mean_sst_5year","mean_DHW_5year","gravtot2","mean_npp_5year")
+  var_imp$var_names = c("No Violence","Voices","Control of Corruption","NGO Presence","MPA Effectiveness","Human Development Index", "Marine Ecosystem Dependency",
+                                              "Mean pH over 5 years","Depth","Mean SST (5 years)","mean DHW (5 years)","Human gravity","Mean NPP over 5 years")
+  
   
   var_probs = mclapply(rownames(var_imp),function(i){
     
@@ -82,7 +83,7 @@ model_prob = function(prod_data,modeloutput){
     
     return(plot_list)
     
-  }, mc.cores = 1)
+  }, mc.cores = 6)
   
   var_probs_flat = var_probs %>% flatten()
   
@@ -93,12 +94,12 @@ model_prob = function(prod_data,modeloutput){
   load("outputs/var_probs_flat.RData")
   
   #For each group of covariates, three plots 
-  plot1 = var_probs_flat[1:3]
+  plot1 = var_probs_flat[1:4]
   plot2 = var_probs_flat[4:6]
   plot3 = var_probs_flat[7:9]
-  plot4 = var_probs_flat[10:13]
+  plot4 = var_probs_flat[11:13]
   
-  bigplot = plot_grid(plotlist=plot1,ncol=3)
+  bigplot = plot_grid(plotlist=plot1,ncol=4)
   
   ggsave("figures/Figure4_1.pdf",height=210,width=297,units="mm")
   ggsave("figures/Figure4_1.png",height=210,width=297,units="mm")

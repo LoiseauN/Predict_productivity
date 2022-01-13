@@ -16,6 +16,8 @@ RLS_prod_figures = RLS_prod_all %>%
   left_join(RLS_info, by ="SurveyID") %>%
   filter(site_code %in% RLS_Management$site_code)
 
+length(unique(RLS_prod_figures$Species))
+
 RLS_prod_transect_figures = RLS_prod %>%
   filter(site_code %in% RLS_Management$site_code)
 

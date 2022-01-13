@@ -1,6 +1,6 @@
 #-----------------Loading packages-------------------
 
-pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot","rfishbase","beepr","stars","factoextra", "magrittr",
+pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot","rfishbase","beepr","stars","factoextra", "magrittr","ggnewscale",
           "rnaturalearth","plotly","ggridges","ggbeeswarm","ggforce","rfishbase","parameters","NbClust","cluster","klaR","beepr","gstat",
           "harrypotter","wesanderson","dichromat","ranger","ggpubr","data.table","pdp","png","sf","broom.mixed","arm","performance","see")
 nip <- pkgs[!(pkgs %in% installed.packages())]

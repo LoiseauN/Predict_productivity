@@ -8,6 +8,8 @@
 
 
 plot_var_imp <- function(model_test_output){
+  
+  model_test_output = model_test
 
   
   #Getting variable importance from output list
@@ -21,8 +23,8 @@ plot_var_imp <- function(model_test_output){
     mutate(percentage = (importance.mod.*100)/sum(importance.mod.))%>%
     arrange(percentage)
   
-  rel_inf$var_names = c("NoViolence","Voices","ControlofCorruption","NGO","Effectiveness","MarineEcosystemDependency",
-                        "HDI","	mean_pH_1year_5year","Depth","mean_sst_5year","mean_DHW_5year","gravtot2","mean_npp_5year")
+  rel_inf$var_names = c("No Violence","Voices","Control of Corruption","NGO Presence","MPA Effectiveness","Human Development Index", "Marine Ecosystem Dependency",
+                        "Mean pH over 5 years","Depth","Mean SST (5 years)","mean DHW (5 years)","Human gravity","Mean NPP over 5 years")
 
   plot = ggdotchart(rel_inf,x = "var_names",y="percentage",
                     color = "var_names",
@@ -42,5 +44,5 @@ plot_var_imp <- function(model_test_output){
   ggpar(plot, legend = "none")
     
   ggsave("Figures/Figure3.pdf",height=210,width=297,units="mm")
-            
+  ggsave("Figures/Figure3.png",height=210,width=297,units="mm")      
 }
