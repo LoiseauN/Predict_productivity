@@ -19,7 +19,7 @@ data_covariates <- function(data_prod,env_data,mpa_data,socio_data){
     #Keeping tropical only
     filter(min_sst_5year > 17) %>% 
     #Selecting variables of interest
-    dplyr::select(SurveyID,site_code,Depth,mean_sst_5year,gravtot2,mean_npp_5year,No.take.multizoned,Biom,
+    dplyr::select(SurveyID,site_code,Depth,gravtot2,mean_npp_5year,No.take.multizoned,mean_sst_5year,
                   mean_pH_1year_5year,mean_DHW_5year,NoViolence,ControlofCorruption,
                   Voice,HDI,MarineEcosystemDependency,Depth,NGO,Effectiveness,log10ProdB,log10Prod,log10Biom,SiteLatitude,SiteLongitude,Country)
   

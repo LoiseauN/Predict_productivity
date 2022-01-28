@@ -8,13 +8,14 @@
 
 
 test_model <- function(prod_data){
+  
+  prod_data = RLS_Management
  
   #Selecting covariables of interest
   data_formodel = prod_data %>%
     dplyr::select(-c(site_code, SurveyID, No.take.multizoned, log10ProdB:Country)) %>%
     na.omit()
-    
-    colnames(data_formodel)
+
 
 #Running random foret a 100 times
 ranger_loop = mclapply(1:100,function(i){
@@ -29,6 +30,8 @@ ranger_loop = mclapply(1:100,function(i){
   score=predict(mod,test)
   
   CM = caret::confusionMatrix(score$predictions,test$Class)
+  
+  CM$byClass
   
   model_varImp = list(data.frame(variable_importance <- rownames_to_column(as.data.frame(importance(mod)))),
                       data.frame(Accuracy = CM$overall[1],

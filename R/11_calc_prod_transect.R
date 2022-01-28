@@ -23,14 +23,14 @@ calc_prod_transect <- function(data_with_prod,transect_info){
   data_with_prod = data_with_prod %>% left_join(transect_site, by = "SurveyID")
   
   #At the scale of the community (transect)
-  data_prod_brut <-  data_with_prod[,c("site_code","Biom","Prod")]
+  data_prod_brut <-  data_with_prod[,c("SurveyID","Biom","Prod")]
+  data_prod_brut_sites <-  data_with_prod[,c("SurveyID","site_code")]
+  data_prod_brut <- aggregate(. ~ SurveyID, data = data_prod_brut, sum, na.rm=T)
   data_prod_brut$Productivity  <- data_prod_brut$Prod/data_prod_brut$Biom
+  data_prod_brut <- left_join(data_prod_brut,data_prod_brut_sites,by="SurveyID")
+  data_prod_brut <- aggregate(. ~ site_code, data = data_prod_brut[-1], mean, na.rm=T)
   
-  boxplot(data_prod_brut$Biom)
-  
-  data_prod_brut <- aggregate(. ~ site_code, data = data_prod_brut, mean, na.rm=T)
-  
-  data_prod_brut <- left_join(data_prod_brut,transect_info,by="site_code")
+  data_prod_brut = left_join(data_prod_brut, transect_info, by ="site_code")
   
   data_prod_brut$log10ProdB <-log10(data_prod_brut$Productivity+1)
   data_prod_brut$log10Biom <-log10(data_prod_brut$Biom+1)

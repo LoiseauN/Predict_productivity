@@ -6,7 +6,7 @@
 #' @return dataframe with biomass/biomass production/productivity calculated for all communities in RLS data base
 #' 
 calc_prod <- function(data_prod){
-
+  
   #Size corrections
   data_forprod = data_prod %>%
     #If observed size is higher than the maximum reported size, then replace observed size with maximum size
