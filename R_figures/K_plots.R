@@ -7,6 +7,7 @@
 #' 
 
 K_plots = function(data_prod){
+
   
   data_plot = data_prod %>%
     group_by(Species)%>%
@@ -111,7 +112,10 @@ K_plots = function(data_prod){
   ggsave("Figures/K_by_size_details.png",height = 210,width=297,units="mm")
   ggsave("Figures/K_by_size_details.pdf",height = 210,width=297,units="mm")
   
-  K_by_family = ggplot(data_prod,aes(reorder(Family,-log(K_pred+1)),log(K_pred+1),fill=Family,colour=Family))+
+  
+  data_prod = RLS_prod_figures
+  
+  K_by_family = ggplot(data_prod,aes(reorder(Family,-K_pred),log(K_pred+1),fill=Family,colour=Family))+
       geom_jitter(size = 0.1, alpha = 0.2)+
       geom_boxplot(alpha = 0.7)+
       scale_fill_viridis_d()+
@@ -123,6 +127,6 @@ K_plots = function(data_prod){
             x = "")
   
   ggsave(K_by_family,"Figures/K_by_family.pdf",height=210,width=297, units = "mm")
-  ggsave(K_by_family,"Figures/K_by_family.png",height=210,width=297, units = "mm")
+  ggsave("Figures/K_by_family.png",height=210,width=297, units = "mm")
   
 }

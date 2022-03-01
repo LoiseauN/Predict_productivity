@@ -7,10 +7,7 @@
 #' 
 
 model_prob = function(prod_data,modeloutput){
-  
-  prod_data = RLS_Management
-  modeloutput = test_model
-  
+
   #Selecting covariables of interest
   data_formodel = prod_data %>%
     dplyr::select(-c(site_code, SurveyID, No.take.multizoned, log10ProdB:Country)) %>%
@@ -20,7 +17,7 @@ model_prob = function(prod_data,modeloutput){
   #Full model and delete transition data
   mod = ranger(Class~.,data=data_formodel,mtry=3,probability = T,num.trees=1000)
   
-  var_imp = model_test_output[[1]] %>%
+  var_imp = modeloutput[[1]] %>%
     #Keeping only variables and their importance
     dplyr::select(rowname,importance.mod.)%>%
     na.omit()%>%
@@ -28,18 +25,22 @@ model_prob = function(prod_data,modeloutput){
     dplyr::group_by(rowname)%>%
     dplyr::summarize(importance.mod.=mean(importance.mod.))%>%
     mutate(percentage = (importance.mod.*100)/sum(importance.mod.))%>%
-    arrange(percentage) %>%
-    column_to_rownames("rowname")
+    arrange(percentage) 
   
-  var_imp$var_names = c("No Violence","Voices","Control of Corruption","NGO Presence","MPA Effectiveness","Human Development Index", "Marine Ecosystem Dependency",
-                                              "Mean pH over 5 years","Depth","Mean SST (5 years)","mean DHW (5 years)","Human gravity","Mean NPP over 5 years")
+  var_imp$var_names = recode_factor(var_imp$rowname, depth = "Depth",Effectiveness = "MPA Effectiveness",ControlofCorruption = "Control of Corruption",HDI = "Human Development Index",NoViolence = "No Violence",
+                                    Voice = "Voice",MarineEcosystemDependency = "Marine Ecosystem Dependency",NGO = "NGO Presence",mean_DHW_5year = "Mean DHW over 5 years",
+                                    gravtot2 = "Human gravity",mean_npp_5year="Mean NPP over 5 years",mean_pH_1year_5year="mean pH over 5 years",mean_sst_5year="Mean SST over 5 years")
+  
+  var_imp$var_names = fct_reorder(var_imp$var_names, var_imp$percentage)
+  
+  var_imp = var_imp %>% column_to_rownames('rowname')
   
   
   var_probs = mclapply(rownames(var_imp),function(i){
     
     pd = NULL
     plot_list = list()
-    for (p in 1:3) {
+    for (p in 1:4) {
       tmp <- pdp::partial(mod, pred.var = c(i),
                           which.class = p, grid.resolution = 101 ,n.trees=1000)
       pd <- rbind(pd, cbind(tmp, Class = levels(prod_data$Class)[p]))
@@ -77,7 +78,17 @@ model_prob = function(prod_data,modeloutput){
            y="")+
       guides(fill=F)
     
-    (plots = ggarrange(pristine, partial, deadzone, ncol = 1,nrow=3))
+    transition = pd %>%
+      filter(Class=="transition")%>%
+      ggplot(aes(eval(parse(text = paste(i))),yhat))+
+      geom_point(colour="lightblue",size=3,alpha=0.7)+
+      geom_smooth(se=F)+
+      theme_bw()+
+      labs(x= var_imp[i,3],
+           y="")+
+      guides(fill=F)
+    
+    (plots = ggarrange(pristine, partial, deadzone, transition, ncol = 1,nrow=4))
     
     plot_list[[i]] = plots
     
@@ -95,8 +106,8 @@ model_prob = function(prod_data,modeloutput){
   
   #For each group of covariates, three plots 
   plot1 = var_probs_flat[1:4]
-  plot2 = var_probs_flat[4:6]
-  plot3 = var_probs_flat[7:9]
+  plot2 = var_probs_flat[5:7]
+  plot3 = var_probs_flat[8:10]
   plot4 = var_probs_flat[11:13]
   
   bigplot = plot_grid(plotlist=plot1,ncol=4)

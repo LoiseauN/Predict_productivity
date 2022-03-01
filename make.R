@@ -23,7 +23,7 @@ colnames(mpa)[1] <- "SurveyID"
 
 path = (here::here("outputs"))
 setwd(path)
-files <- list.files(here::here("outputs"),pattern = ".Rdata")
+files <- list.files(here::here("outputs"),pattern = ".Rdata|RData")
 data_list = lapply(files, load, .GlobalEnv)
 
 #-----------------Loading all functions---------------------

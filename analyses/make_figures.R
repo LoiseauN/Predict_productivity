@@ -6,27 +6,21 @@
 make_figures = function(){
   
 #Info data 
-RLS_info = info %>%
-  dplyr::select(site_code,survey_id) %>%
-  dplyr::rename(SurveyID = "survey_id")
+setwd(here())
+RLS_info = read.table("data/RLS_transect_info.txt") %>%
+  dplyr::rename(site_code = "SiteCode")
 
 #We need these dataframes for some figures
 #Productivity at commmunity level but only for kept transects
 RLS_prod_figures = RLS_prod_all %>%
   left_join(RLS_info, by ="SurveyID") %>%
-  filter(site_code %in% RLS_Management$site_code)
-
-length(unique(RLS_prod_figures$Species))
-
-RLS_prod_transect_figures = RLS_prod %>%
-  filter(site_code %in% RLS_Management$site_code)
+  filter(SurveyID %in% RLS_Covariates_transect$SurveyID)
 
 #Plot figure representing K by size for each family and for some examples 
 K_plots(RLS_prod_figures)
 
 #Plot number of predeictions for K at family, genus and species level
 #Check pred_type column for precise number
-predictions_by_level(RLS_prod_figures)
   
 #Plot comparison of metrics biomass/biomass production/productivity and correlation levels
 plot_metrics_comparison(RLS_Management)
@@ -46,6 +40,7 @@ plot_var_imp(model_test)
 #Figure 3 : representations between variables and management classes
 model_prob(RLS_Management,model_test)
 
+#Supplementary maps of sites and transects
 #MTE plots
 plot_MTE(data_prepped, fam_model_K)
 

@@ -6,9 +6,7 @@
 
 
 plot_classes <- function(data_prod){
-  
-  data_prod = RLS_Management
-  
+
   biom75 = quantile(data_prod$log10Biom,0.95)
   biom25 = quantile(data_prod$log10Biom,0.25)
   prod75 = quantile(data_prod$log10ProdB,0.75)
@@ -24,10 +22,10 @@ plot_classes <- function(data_prod){
       geom_hline(yintercept = prod25, linetype = "solid")+
      geom_point(size=4,alpha=0.4)+
      scale_colour_manual(values=group.colors,labels=c("Low Productivity/Biomass reefs","Productive reefs","High Biomass reefs","Mid-range reefs"))+
-     scale_fill_manual(values=group.colors,labels=c("Low Productivity/Biomass reefs","Productive reefs","High Biomass reefs","Mid-range reefs"))+
      labs(x="Biomass (g/m²) - log scale",
           y = "Productivity (%/year) - log scale")+
-     theme_classic())
+     theme_classic() +
+      theme(legend.position = "top"))
 
   
   ggsave("Figures/Figure1.pdf",dpi=300,width = 297, height = 210,units = "mm")
@@ -36,17 +34,18 @@ plot_classes <- function(data_prod){
   library(ggnewscale)
 
   (ggplot(data_prod,aes(log10Biom,log10ProdB))+
-      geom_mark_hull(aes(fill = Class), con.cap= 0, expand = 0, radius = 0, alpha = 0.3)+
-      scale_fill_manual(values=group.colors,labels=c("Low Productivity/Biomass reefs","Productive reefs","High Biomass reefs"))+
-      ggnewscale::new_scale_fill() +
+      geom_vline(xintercept = biom75, linetype = "solid")+
+      geom_vline(xintercept = biom25, linetype = "solid")+
+      geom_hline(yintercept = prod75, linetype = "solid")+
+      geom_hline(yintercept = prod25, linetype = "solid")+
       geom_point(shape=21,color="black",aes(size=gravtot2,fill = MarineEcosystemDependency), alpha = 0.6)+
       scale_fill_viridis_c(option="D") +
       scale_alpha_continuous(range = c(0.3, 1)) +
       labs(x="Biomass (g/m²) - log scale",
-           y = "Productivity (%/year)",
+           y = "Productivity (%/year) - log scale",
            fill = "Marine Ecosystem Dependency",
            size = "Gravity") +
-      scale_size(range = c(0.5,15))+
+      scale_size(range = c(1,15))+
       theme_classic())
   
 ggsave("Figures/Figure_gravity.pdf",dpi=300,width = 297, height = 210,units = "mm")
@@ -56,9 +55,10 @@ data_prod$No.take.multizoned[data_prod$No.take.multizoned == "No Take"] = data_p
 data_prod$No.take.multizoned[data_prod$No.take.multizoned == "No take "] = data_prod$No.take.multizoned[data_prod$No.take.multizoned == "No take"]
 
 (ggplot(data_prod,aes(log10Biom,log10ProdB))+
-    geom_mark_hull(aes(fill = Class), con.cap= 0, expand = 0, radius = 0, alpha = 0.3)+
-    scale_fill_manual(values=group.colors,labels=c("Low Productivity/Biomass reefs","Productive reefs","High Biomass reefs"))+
-    ggnewscale::new_scale_fill() +
+    geom_vline(xintercept = biom75, linetype = "solid")+
+    geom_vline(xintercept = biom25, linetype = "solid")+
+    geom_hline(yintercept = prod75, linetype = "solid")+
+    geom_hline(yintercept = prod25, linetype = "solid")+
     geom_point(size=3,alpha=0.4,shape=21,color="black",aes(fill=No.take.multizoned))+
     scale_fill_viridis_d()+
     labs(x="Biomass (g/m²) - log scale",
