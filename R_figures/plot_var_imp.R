@@ -6,9 +6,7 @@
 #' 
 
 
-
-plot_var_imp <- function(model_test_output){
-
+plot_var_imp <- function(model_test_output,threshold){
   
   #Getting variable importance from output list
   rel_inf = model_test_output[[1]] %>%
@@ -23,7 +21,7 @@ plot_var_imp <- function(model_test_output){
     mutate(variabletype = ifelse(rowname %in% c("Depth","mean_DHW_5year","mean_pH_1year_5year","mean_npp_5year","mean_sst_5year"),"Environmental","Socio-economic"),
            rowname = as.factor(rowname))
   
-  rel_inf$var_names = recode_factor(rel_inf$rowname, depth = "Depth",Effectiveness = "MPA Effectiveness",ControlofCorruption = "Control of Corruption",HDI = "Human Development Index",NoViolence = "No Violence",
+  rel_inf$var_names = recode_factor(rel_inf$rowname, depth = "Depth",No.take.multizoned = "Management",ControlofCorruption = "Control of Corruption",HDI = "Human Development Index",NoViolence = "No Violence",
                                     Voice = "Voice",MarineEcosystemDependency = "Marine Ecosystem Dependency",NGO = "NGO Presence",mean_DHW_5year = "Mean DHW over 5 years",
                                     gravtot2 = "Human gravity",mean_npp_5year="Mean NPP over 5 years",mean_pH_1year_5year="mean pH over 5 years",mean_sst_5year="Mean SST over 5 years")
   
@@ -46,8 +44,8 @@ plot_var_imp <- function(model_test_output){
                     ggtheme = theme_pubclean(),
                     legend.title = "Variable type")
   
-  ggpar(plot, legend = "bottom")
+  finalplot =ggpar(plot, legend = "bottom")
     
-  ggsave("Figures/Figure3_+5.pdf",height=210,width=297,units="mm")
-  ggsave("Figures/Figure3_+5.png",height=210,width=297,units="mm")      
+  ggsave(filename = paste0("Figures/Figure3_",threshold,".pdf"),height=210,width=297,units="mm")
+  ggsave(finalplot,filename = paste0("Figures/Figure3_",threshold,".png"),height=210,width=297,units="mm")    
 }

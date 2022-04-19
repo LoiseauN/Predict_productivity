@@ -1,7 +1,7 @@
 #-----------------Loading packages-------------------
 
-pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot","rfishbase","beepr","stars","factoextra", "magrittr","ggnewscale",
-          "rnaturalearth","plotly","ggridges","ggbeeswarm","ggforce","rfishbase","parameters","NbClust","cluster","klaR","beepr","gstat",
+pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot","rfishbase","beepr","stars","factoextra", "magrittr","ggnewscale","pbmcapply",
+          "rnaturalearth","plotly","ggridges","ggbeeswarm","ggforce","rfishbase","parameters","NbClust","cluster","klaR","beepr","gstat","ggspatial","maps","maptools","grid",
           "harrypotter","wesanderson","dichromat","ranger","ggpubr","data.table","pdp","png","sf","broom.mixed","arm","performance","see")
 nip <- pkgs[!(pkgs %in% installed.packages())]
 nip <- lapply(nip, install.packages, dependencies = TRUE)
@@ -61,8 +61,9 @@ data_list = lapply(files, load, .GlobalEnv)
 
 setwd(here())
 
-world = ne_countries(scale = "small", returnclass = "sf")
-world = st_transform(world, "+proj=robin +lon_0=0 +x_0=0 +y_0=0 +ellps=WGS84 +datum=WGS84 +units=m +no_defs")
+# world = ne_countries(scale = "small", returnclass = "sf") %>% filter(admin != "Antarctica")
+#Loading world data, load from https://public.opendatasoft.com/explore/dataset/world-administrative-boundaries/export/
+world = st_read("data/world-administrative-boundaries/world-administrative-boundaries.shp")
 
 #Making all the figures for the paper
 make_figures()

@@ -8,14 +8,12 @@
 
 
 test_model <- function(prod_data){
+
   
-  prod_data = RLS_Management
- 
   #Selecting covariables of interest
   data_formodel = prod_data %>%
-    dplyr::select(-c(site_code, SurveyID, No.take.multizoned, log10ProdB:Country)) %>%
+    dplyr::select(-c(site_code, SurveyID, Biom, Prod, Effectiveness, Productivity, log10ProdB:Country)) %>%
     na.omit()
-
 
 #Running random foret a 100 times
 ranger_loop = mclapply(1:100,function(i){
@@ -25,7 +23,7 @@ ranger_loop = mclapply(1:100,function(i){
   train <- training(data_split)
   test <- testing(data_split)
   
-  mod = ranger(Class~.,data=train,mtry=3,probability=F,num.trees=1000,importance="permutation")
+  mod = ranger(Class~ .,data=train,mtry=3,probability=F,num.trees=1000,importance="permutation")
   
   score=predict(mod,test)
   
@@ -40,7 +38,7 @@ ranger_loop = mclapply(1:100,function(i){
                       data.frame(Balanced_Accuracy = CM$byClass[,11]))
   return(model_varImp)
   
-},mc.cores = 1)
+},mc.cores = 5)
 
 #Getting variable importance from output list
 rel_inf = ranger_loop %>%

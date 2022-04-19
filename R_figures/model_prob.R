@@ -7,11 +7,14 @@
 #' 
 
 model_prob = function(prod_data,modeloutput){
-
+  
+  prod_data = RLS_Management
+  modeloutput = model_test
+  
   #Selecting covariables of interest
   data_formodel = prod_data %>%
-    dplyr::select(-c(site_code, SurveyID, No.take.multizoned, log10ProdB:Country)) %>%
-    mutate(gravtot2 = log(gravtot2+1))%>%
+    dplyr::select(-c(site_code, SurveyID, Effectiveness, log10ProdB, Productivity, Biom, Prod, Country, log10Prod:SiteLongitude)) %>%
+    mutate(gravtot2 = log(gravtot2+1)) %>% 
     na.omit()
   
   #Full model and delete transition data
@@ -27,7 +30,7 @@ model_prob = function(prod_data,modeloutput){
     mutate(percentage = (importance.mod.*100)/sum(importance.mod.))%>%
     arrange(percentage) 
   
-  var_imp$var_names = recode_factor(var_imp$rowname, depth = "Depth",Effectiveness = "MPA Effectiveness",ControlofCorruption = "Control of Corruption",HDI = "Human Development Index",NoViolence = "No Violence",
+  var_imp$var_names = recode_factor(var_imp$rowname, depth = "Depth",No.take.multizoned = "Management",ControlofCorruption = "Control of Corruption",HDI = "Human Development Index",NoViolence = "No Violence",
                                     Voice = "Voice",MarineEcosystemDependency = "Marine Ecosystem Dependency",NGO = "NGO Presence",mean_DHW_5year = "Mean DHW over 5 years",
                                     gravtot2 = "Human gravity",mean_npp_5year="Mean NPP over 5 years",mean_pH_1year_5year="mean pH over 5 years",mean_sst_5year="Mean SST over 5 years")
   
@@ -36,13 +39,13 @@ model_prob = function(prod_data,modeloutput){
   var_imp = var_imp %>% column_to_rownames('rowname')
   
   
-  var_probs = mclapply(rownames(var_imp),function(i){
+  var_probs = pbmclapply(rownames(var_imp),function(i){
     
     pd = NULL
     plot_list = list()
     for (p in 1:4) {
       tmp <- pdp::partial(mod, pred.var = c(i),
-                          which.class = p, grid.resolution = 101 ,n.trees=1000)
+                          which.class = p, grid.resolution = 101 ,n.trees=1000,type = "classification",prob = T)
       pd <- rbind(pd, cbind(tmp, Class = levels(prod_data$Class)[p]))
       
     }
@@ -105,12 +108,12 @@ model_prob = function(prod_data,modeloutput){
   load("outputs/var_probs_flat.RData")
   
   #For each group of covariates, three plots 
-  plot1 = var_probs_flat[1:4]
-  plot2 = var_probs_flat[5:7]
-  plot3 = var_probs_flat[8:10]
-  plot4 = var_probs_flat[11:13]
+  plot1 = var_probs_flat[1:3]
+  plot2 = var_probs_flat[4:6]
+  plot3 = var_probs_flat[7:9]
+  plot4 = var_probs_flat[10:12]
   
-  bigplot = plot_grid(plotlist=plot1,ncol=4)
+  bigplot = plot_grid(plotlist=plot1,ncol=3)
   
   ggsave("figures/Figure4_1.pdf",height=210,width=297,units="mm")
   ggsave("figures/Figure4_1.png",height=210,width=297,units="mm")

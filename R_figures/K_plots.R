@@ -8,10 +8,12 @@
 
 K_plots = function(data_prod){
 
+  data_prod = RLS_prod_figures
   
   data_plot = data_prod %>%
     group_by(Species)%>%
-    mutate(K = log(mean(K_pred)+1),
+    mutate(K = Kmax,
+           # K = log10(Kmax),
            Family = as.factor(Family),
            Species = as.factor(Species))%>%
     distinct(K,.keep_all=T)
@@ -19,13 +21,13 @@ K_plots = function(data_prod){
   
   mycolors <- colorRampPalette(wes_palette("Darjeeling1", 27, type = "continuous"))(138)
   
-  (p = ggscatter(data_plot,x="MaxLength",y="K",
+  (p = ggscatter(data_plot,x="MaxSizeTL",y="K",
             color="Family",
             palette = mycolors,
             size=3,alpha=0.6)+
     border()+ 
     labs(
-    y="Estimated growth rate K (log scale)",
+    y="Kmax",
     x="Maximum observed size (cm)")+
     theme(legend.position = "none", legend.key.width=unit(3,"cm")) + stat_smooth(method = lm, formula = y ~ log(x),se=F,))
     
@@ -38,33 +40,33 @@ K_plots = function(data_prod){
   data_Serranidae = data_prod %>%
     filter(Family == "Serranidae")%>%
     group_by(Species)%>%
-    mutate(K_pred2 = mean(K_pred))%>%
+    mutate(K_pred2 = mean(Kmax))%>%
     ungroup()
   
   data_labridae = data_prod %>%
     filter(Family == "Labridae")%>%
     group_by(Species)%>%
-    mutate(K_pred2 = mean(K_pred))%>%
+    mutate(K_pred2 = mean(Kmax))%>%
     ungroup()
   
-  (p_Serranidae = ggscatter(data_Serranidae,x="MaxLength",y="K_pred2",
+  (p_Serranidae = ggscatter(data_Serranidae,x="MaxSizeTL",y="K_pred2",
                  palette = mycolors,
                  size=3,alpha=0.6)+
       border()+ stat_smooth(method = lm, formula = y ~ log(x)) +
     # add_fishape(family="Lutjanidae",option="Lutjanus_gibbus",
     #             xmin=140,xmax=160,ymin=0.75,ymax=1,fill="darkblue",alpha=0.7)+
     labs(title="Serranidae",
-         y="Estimated growth rate K",
+         y="Kmax",
          x="Maximum observed size (cm)"))
   
-  (p_labridae = ggscatter(data_labridae,x="MaxLength",y="K_pred2",
+  (p_labridae = ggscatter(data_labridae,x="MaxSizeTL",y="K_pred2",
                  palette = mycolors,
                  size=3,alpha=0.6)+
       # add_fishape(family="Labridae",option="Epibulus_insidiator",
       #             xmin=200,xmax=230,ymin=5,ymax=8,fill="darkblue",alpha=0.7)+
       border()+ stat_smooth(method = lm, formula = y ~ log(x)) +
     labs(title="Labridae",
-         y="Estimated growth rate K",
+         y="Kmax",
          x="Maximum observed size (cm)"))
   
   (p_family = ggarrange(p_Serranidae,p_labridae))
@@ -75,32 +77,32 @@ K_plots = function(data_prod){
   data_Epinephelus = data_prod %>%
     filter(Genus == "Epinephelus")%>%
     group_by(Species)%>%
-    mutate(K_pred2 = mean(K_pred))%>%
+    mutate(K_pred2 = mean(Kmax))%>%
     ungroup()
   
   data_Scarus = data_prod %>%
     filter(Genus == "Scarus")%>%
     group_by(Species)%>%
-    mutate(K_pred2 = mean(K_pred))%>%
+    mutate(K_pred2 = mean(Kmax))%>%
     ungroup()
   
-  (p_Epinephelus = ggscatter(data_Epinephelus,x="MaxLength",y="K_pred2",
+  (p_Epinephelus = ggscatter(data_Epinephelus,x="MaxSizeTL",y="K_pred2",
                  palette = mycolors,
                  size=3,alpha=0.6)+
       border()+ stat_smooth(method = lm, formula = y ~ log(x)) +
     # add_fishape(family="Lutjanidae",option="Lutjanus_gibbus",
     #             xmin=140,xmax=160,ymin=0.8,ymax=1,fill="darkblue",alpha=0.7)+
     labs(title="Epinephelus",
-         y="Estimated growth rate K",
+         y="Kmax",
          x="Maximum observed size (cm)"))
   
 
-  (p_Scarus= ggscatter(data_Scarus,x="MaxLength",y="K_pred2",
+  (p_Scarus= ggscatter(data_Scarus,x="MaxSizeTL",y="K_pred2",
                  palette = mycolors,
                  size=3,alpha=0.6)+
       border()+ stat_smooth(method = lm, formula = y ~ log(x))+
     labs(title="Scarus",
-         y="Estimated growth rate K",
+         y="Kmax",
          x="Maximum observed size (cm)"))
     # add_fishape(family="Labridae",option="Epibulus_insidiator",
     #             xmin=190,xmax=220,ymin=3,ymax=4,fill="darkblue",alpha=0.7))
@@ -112,10 +114,7 @@ K_plots = function(data_prod){
   ggsave("Figures/K_by_size_details.png",height = 210,width=297,units="mm")
   ggsave("Figures/K_by_size_details.pdf",height = 210,width=297,units="mm")
   
-  
-  data_prod = RLS_prod_figures
-  
-  K_by_family = ggplot(data_prod,aes(reorder(Family,-K_pred),log(K_pred+1),fill=Family,colour=Family))+
+  K_by_family = ggplot(data_prod,aes(reorder(Family,-Kmax),Kmax,fill=Family,colour=Family))+
       geom_jitter(size = 0.1, alpha = 0.2)+
       geom_boxplot(alpha = 0.7)+
       scale_fill_viridis_d()+
@@ -123,10 +122,10 @@ K_plots = function(data_prod){
       theme_bw()+
       theme(legend.position = "none")+
       theme(axis.text.x = element_text(angle = 90, vjust = 0.5, hjust=1))+
-      labs( y = "Estimated growth rate K (log scale)",
+      labs( y = "Kmax",
             x = "")
   
   ggsave(K_by_family,"Figures/K_by_family.pdf",height=210,width=297, units = "mm")
-  ggsave("Figures/K_by_family.png",height=210,width=297, units = "mm")
+  ggsave(K_by_family,"Figures/K_by_family.png",height=210,width=297, units = "mm")
   
 }

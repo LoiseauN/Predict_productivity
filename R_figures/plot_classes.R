@@ -23,7 +23,7 @@ plot_classes <- function(data_prod){
      geom_point(size=4,alpha=0.4)+
      scale_colour_manual(values=group.colors,labels=c("Low Productivity/Biomass reefs","Productive reefs","High Biomass reefs","Mid-range reefs"))+
      labs(x="Biomass (g/m²) - log scale",
-          y = "Productivity (%/year) - log scale")+
+          y = "Biomass turnover - P/B (%/day)")+
      theme_classic() +
       theme(legend.position = "top"))
 
@@ -42,7 +42,7 @@ plot_classes <- function(data_prod){
       scale_fill_viridis_c(option="D") +
       scale_alpha_continuous(range = c(0.3, 1)) +
       labs(x="Biomass (g/m²) - log scale",
-           y = "Productivity (%/year) - log scale",
+           y = "Biomass turnover - P/B (%/day)",
            fill = "Marine Ecosystem Dependency",
            size = "Gravity") +
       scale_size(range = c(1,15))+
@@ -62,7 +62,7 @@ data_prod$No.take.multizoned[data_prod$No.take.multizoned == "No take "] = data_
     geom_point(size=3,alpha=0.4,shape=21,color="black",aes(fill=No.take.multizoned))+
     scale_fill_viridis_d()+
     labs(x="Biomass (g/m²) - log scale",
-         y = "Productivity (%/year) - log scale",
+         y = "Biomass turnover - P/B (%/day)",
          fill = "Protection status")+
     theme_classic())
 

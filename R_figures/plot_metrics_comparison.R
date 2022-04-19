@@ -7,14 +7,14 @@
 #' 
 
 plot_metrics_comparison = function(data_transect){
-
+  
   prod_biom_lm = cor(data_transect$log10Prod,data_transect$log10Biom,method="pearson")
   pvalue1 = cor.test(data_transect$log10Prod,data_transect$log10Biom,method="pearson")$p.value
   
   ggplot(data_transect,aes(x=log10Biom,y=log10Prod))+
     geom_point(aes(colour=log(gravtot2+1)))+
     scale_colour_viridis_c(name="Gravity - log scale")+
-    geom_smooth(method="lm",color='black',se=F)+
+    geom_smooth()+
     theme_bw()+
     labs(x="Biomass (g/m^2) - log scale",
          y="Biomass production (g/m^2/year) - log scale")
@@ -30,7 +30,7 @@ plot_metrics_comparison = function(data_transect){
     geom_smooth(method="lm",color='black',se=F)+
     theme_bw()+
     labs(x="Biomass (g/m^2) - log scale",
-         y="Productivity (%/year) - log scale")
+         y="Biomass turnover - P/B (%/day)")
   
   ggsave("Figures/prodB_biom.png",height=210, width= 297,units="mm")
   
@@ -42,7 +42,7 @@ plot_metrics_comparison = function(data_transect){
     scale_colour_viridis_c(name="Gravity - log scale")+
     geom_smooth(method="lm",color='black',se=F)+
     theme_bw()+
-    labs(x="Productivity (%/year) - log scale",
+    labs(x="Biomass turnover - P/B (%/day)",
          y="Biomass production (g/m^2/year) - log scale")
   
   ggsave("Figures/proB_prod.png",height=210, width= 297,units="mm")
