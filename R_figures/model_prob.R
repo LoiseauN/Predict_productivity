@@ -13,8 +13,8 @@ model_prob = function(prod_data,modeloutput){
   
   #Selecting covariables of interest
   data_formodel = prod_data %>%
-    dplyr::select(-c(site_code, SurveyID, Effectiveness, log10ProdB, Productivity, Biom, Prod, Country, log10Prod:SiteLongitude)) %>%
-    mutate(gravtot2 = log(gravtot2+1)) %>% 
+    dplyr::select(-c(site_code, Effectiveness, log10ProdB, Productivity, Biom, Prod, Country, log10Prod:SiteLongitude)) %>%
+    mutate(gravtot2 = log10(gravtot2+1)) %>% 
     na.omit()
   
   #Full model and delete transition data

@@ -20,13 +20,13 @@ calc_prod_rfishprod <- function(data_final){
                   b = "lwb") %>%
     mutate(Size = ifelse(Size >= MaxSizeTL,MaxSizeTL,Size))
 
-  
-  # # Check dataset repdata #
+
+  # Check dataset repdata #
   # (repdata <- rfishprod:::repdata)
   # 
   # # Getting levels ready #
   # repdata <- rfishprod::tidytrait (repdata, db)
-
+  # data_final_prod = repdata
   
   datagr <- rfishprod::predKmax(data_final_prod,
                       dataset = db, 
@@ -79,7 +79,6 @@ calc_prod_rfishprod <- function(data_final){
            Prod = ifelse(mortality == T, (somatic_growth * Num),0))
   
   return(datagr_prod)
-
   
 }
   

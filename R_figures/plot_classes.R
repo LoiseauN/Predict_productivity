@@ -6,6 +6,9 @@
 
 
 plot_classes <- function(data_prod){
+  
+  data_prod = RLS_Management
+
 
   biom75 = quantile(data_prod$log10Biom,0.95)
   biom25 = quantile(data_prod$log10Biom,0.25)
@@ -21,7 +24,7 @@ plot_classes <- function(data_prod){
       geom_hline(yintercept = prod75, linetype = "solid")+
       geom_hline(yintercept = prod25, linetype = "solid")+
      geom_point(size=4,alpha=0.4)+
-     scale_colour_manual(values=group.colors,labels=c("Low Productivity/Biomass reefs","Productive reefs","High Biomass reefs","Mid-range reefs"))+
+     scale_colour_manual(values=group.colors,labels=c("Low biomass/turnover","High turnover","High biomass","Mid-range reefs"))+
      labs(x="Biomass (g/m²) - log scale",
           y = "Biomass turnover - P/B (%/day)")+
      theme_classic() +

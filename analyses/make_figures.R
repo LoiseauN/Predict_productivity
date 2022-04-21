@@ -26,17 +26,21 @@ make_figures = function(){
   # 
   # 
   # #Adding date
-info = info %>% dplyr::select(site_code, survey_date)
   
 #Info data 
 setwd(here())
 RLS_info = read.table("data/RLS_transect_info.txt") %>%
   dplyr::rename(site_code = "SiteCode") %>%
-  dplyr::left_join(info, by = "site_code")
+  dplyr::left_join(info, by = "site_code") %>%
+  dplyr::select(site_code, SurveyID)
+
+High_biomass = RLS_Management %>% 
+  dplyr::select(site_code, Biom) %>%
+  arrange(-Biom) %>%
+  head(2) %>%
+  left_join(RLS_prod_figures, by ="site_code")
 
 
-print(paste("Minimum growth rate:",min(RLS_prod_figures$Kmax)))
-print(paste("Maximum growth rate:",max(RLS_prod_figures$Kmax)))
 print(paste("Minimum biomass:",min(RLS_Management$Biom)))
 print(paste("Maximum biomass:", max(RLS_Management$Biom)))
 print(paste("Minimum production:",min(RLS_Management$Prod)))
@@ -44,15 +48,13 @@ print(paste("Maximum production:", max(RLS_Management$Prod)))
 print(paste("Minimum turnover:",min(RLS_Management$Productivity)))
 print(paste("Maximum turnover:", max(RLS_Management$Productivity)))
 
-#We need these dataframes for some figures
-#Productivity at commmunity level but only for kept transects
-RLS_Management_classes = RLS_Management %>% dplyr::select(site_code, Class, log10ProdB)
+#Specific dataframes
 
 traits_trophic = traits %>%
   dplyr::mutate(Species = sub(" ", "_", CURRENT_SPECIES_NAME)) %>%
-  dplyr::select(Species, Trophic.Level,Trophic.group )
+  dplyr::select(Species, Trophic.Level,Trophic.group,MaxLength )
 
-RLS_prod_all_site = RLS_prod_all %>% dplyr::left_join(RLS_info, by = "SurveyID") %>% dplyr::select(c(Species, Num, Size, W, site_code, survey_date))
+RLS_prod_all_site = RLS_prod_all %>% dplyr::left_join(RLS_info, by = "SurveyID") %>% dplyr::select(c(Species, Genus,Family,Num, Size, MaxSizeTL,W, Kmax,site_code))
 
 RLS_prod_figures = RLS_Management %>%
   left_join(RLS_prod_all_site, by = "site_code") %>%
@@ -80,15 +82,37 @@ RLS_prod_figures = RLS_Management %>%
   dplyr::mutate(class_trophic = mean(trophic_percentage)) %>%
   ungroup()
 
+test = RLS_prod_figures %>%
+  mutate(Diff = MaxSizeTL - Size)
 
+ggplot(test, aes(log(Diff+1), fill = Class)) +
+  geom_histogram() +
+  scale_fill_manual(values = group.colors.class)+
+  labs(x = "Maximum length - Observed size")+
+  facet_wrap(~Class)
+  
 
-test = RLS_prod_figures %>% filter(site_code == "CS217")
-length(unique(RLS_Covariates_transect$SurveyID))
+RLS_prod_figures$TrophGroup <- factor(RLS_prod_figures$TrophGroup, levels=c("2/2.5","2.5/3","3/3.5","3.5/4","4/4.5","4.5/5"))
+group.colors <- c(`2/2.5` = "#144D49", `2.5/3` = "#276C69", `3/3.5` = "#73C1C4", `3.5/4` = "lightgrey", `4/4.5` = "#BF8599",`4.5/5` = "#830342")
 
-RLS_date = RLS_prod_figures %>% dplyr::select(site_code, survey_date, Class) %>% distinct()
-range(RLS_date$survey_date, na.rm = T)
+test = RLS_prod_figures %>%
+  dplyr::select(Class, TrophGroup, class_trophic) %>% distinct() %>%
+  dplyr::filter(Class %in% c("pristine","deadzone")) %>%
+  pivot_wider(names_from = "Class",values_from = "class_trophic") %>%
+  mutate(deadzone = ifelse(is.na(deadzone), 0, deadzone)) %>%
+  mutate(comparison = pristine - deadzone) %>%
+  pivot_longer(cols = c(pristine, deadzone),names_to="Class")
 
+ggplot(test)+
+  geom_bar(aes(x = comparison, y=TrophGroup, fill = TrophGroup), stat='identity')+
+  scale_fill_manual(values = group.colors)+
+  labs(x = "Difference in relative biomass",
+       y= "Trophic group") +
+  theme_bw()
 
+(32532.61/77972490)*100
+
+##########
 group.colors <- c(deadzone = "#d69d4e", partial = "#046c9a", pristine = "#C1DB60", transition = "lightblue")
 
 
@@ -120,16 +144,6 @@ group.colors.class <- c(deadzone = "#d69d4e", partial = "#046c9a", pristine = "#
 
 protection = RLS_prod_figures %>% filter(Class == "partial") %>% dplyr::select(Class, TrophGroup, class_trophic) %>% distinct()
 
-
-# ggplot(RLS_prod_figures %>% filter(Class != "transition"),aes(Class, log10(Size),fill = Class))+
-#   geom_violin()+
-#   scale_fill_manual(values=group.colors.class,labels=c("Low Productivity/Biomass reefs","Productive reefs","High Biomass reefs"))+
-#   scale_x_discrete(labels=c("Low Productivity/Biomass reefs","Productive reefs","High Biomass reefs"))+
-#   theme_minimal()+
-#   labs(x = "",
-#        y= "Fish size - log scale")
-
-
 ggplot(protection)+
   geom_bar(aes(x = TrophGroup,y = class_trophic,fill=TrophGroup),stat='identity')+
   # scale_y_continuous(breaks = brks)+
@@ -137,7 +151,7 @@ ggplot(protection)+
   coord_flip() +
     theme_void()
 
-ggsave("deadzone_trophic.pdf")
+ggsave("partial_trophic.pdf")
 
 protection_pristine = RLS_prod_figures %>% filter(Class == "pristine") %>% dplyr::mutate(Trophic.group = ifelse(Trophic.group == "higher carnivore", "Higher carnivore",Trophic.group))
 protection_deadzone= RLS_prod_figures %>% filter(Class == "deadzone") %>% dplyr::mutate(Trophic.group = ifelse(Trophic.group == "higher carnivore", "Higher carnivore",Trophic.group))
@@ -198,13 +212,13 @@ plot_metrics_comparison(RLS_Management)
 used_taxonomy(RLS_prod_figures)
 
 #World maps of our transects with management information
-map_management(RLS_Management)
+map_management(RLS_Management,world)
 
 #Various representation of our biomass/productivity bi-plot
 plot_classes(RLS_Management)
 
 #Figure 2 : variable importance in our model
-plot_var_imp(model_sensitivity,threshold = 95)
+plot_var_imp(model_sensitivity,threshold = +95)
 
 #Figure 3 : representations between variables and management classes
 model_prob(RLS_Management,model_test)
@@ -215,6 +229,8 @@ model_prob(RLS_Management,model_test)
 
 #K observed versus predicted
 # K_observed_predicted(data_prepped)
+
+summary(RLS_Management)
 
 }
 

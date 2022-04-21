@@ -15,8 +15,8 @@ plot_classes <- function(data_prod){
   (ggplot(data_prod,aes(log10Biom,log10ProdB,colour=Class))+
       geom_mark_hull(aes(fill = Class), con.cap= 0, expand = 0, radius = 0, con.size = 0)+
      geom_point(size=3,alpha=0.4)+
-     scale_colour_manual(values=group.colors,labels=c("Low Productivity/Biomass reefs","Productive reefs","High Biomass reefs"))+
-     scale_fill_manual(values=group.colors,labels=c("Low Productivity/Biomass reefs","Productive reefs","High Biomass reefs"))+
+     scale_colour_manual(values=group.colors,labels=c("Low turnover/biomass reefs","High turnover","High Biomass reefs"))+
+     scale_fill_manual(values=group.colors,labels=c("Low turnover/biomass reefs","Productive reefs","High Biomass reefs"))+
      labs(x="Biomass (g/m²) - log scale",
           y = "Productivity (%/year) - log scale")+
      theme_classic())

@@ -19,8 +19,8 @@ data_management <- function(data_prod,s_sup_biom,s_inf_biom,s_sup_prod,s_inf_pro
   #Diving data into 3 classes for each biomass/productivity relationship
   management = data_prod %>% 
     mutate(Class = ifelse(log10Biom < biom25 & log10ProdB < prod25,"deadzone",
-                          ifelse(log10Biom < biom75 & log10ProdB > prod75,"partial",
-                                 ifelse(log10Biom > biom75,"pristine","transition"))))%>%
+                          ifelse(log10ProdB > prod75,"partial",
+                                 ifelse(log10Biom > biom75 & log10ProdB < prod75,"pristine","transition"))))%>%
     mutate(Class = as.factor(Class))
   
   return(management)

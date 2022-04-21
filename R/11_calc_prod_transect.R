@@ -7,11 +7,6 @@
 #' 
 
 calc_prod_transect <- function(data_with_prod,transect_info){
-
-  
-  summary(data_with_prod)
-  
-  data_with_prod = RLS_prod_all
   
   transect_info <- read.table("data/RLS_transect_info.txt")
   
@@ -30,7 +25,7 @@ calc_prod_transect <- function(data_with_prod,transect_info){
     group_by(SurveyID) %>%
     mutate(Biom = sum(Biom)/500,
            Prod = sum(Prod)/500,
-           Productivity = Prod/Biom) %>%
+           Productivity = (Prod/Biom)*100) %>%
     ungroup() %>%
     #Mean for each site
     group_by(SiteCode) %>%

@@ -125,7 +125,8 @@ K_plots = function(data_prod){
       labs( y = "Kmax",
             x = "")
   
-  ggsave(K_by_family,"Figures/K_by_family.pdf",height=210,width=297, units = "mm")
-  ggsave(K_by_family,"Figures/K_by_family.png",height=210,width=297, units = "mm")
+  #For some reason save doesn't work on this figure
+  # ggsave(K_by_family,"Figures/K_by_family.pdf",height=210,width=297, units = "mm")
+  # ggsave(K_by_family,"Figures/K_by_family.png",height=210,width=297, units = "mm")
   
 }

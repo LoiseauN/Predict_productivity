@@ -36,7 +36,7 @@ map_management <- function(data_prod,world){
   (plot_world = ggplot() +
       geom_sf(data = world, fill = "#171F28", size = 0.2,color = "black") +
     geom_point(data = filter(data_prod, Class != "transition"), size = 8, alpha = 0.7, aes(x=SiteLongitude, y= SiteLatitude, colour=Class))+
-    scale_colour_manual(values=group.colors.notransition,labels=c("Low biomass/productivity","High productivity","High biomass"))+
+    scale_colour_manual(values=group.colors.notransition,labels=c("Low biomass/turnover","High turnover","High biomass"))+
       coord_sf(expand = F,crs=4326)+
       theme_classic() +   theme(legend.title = element_text(size=40),
                             legend.text= element_text(size=40))+
@@ -59,7 +59,7 @@ map_management <- function(data_prod,world){
   plot_pristine = ggplot() +
     geom_sf(data = world, fill = "#171F28", size = 0.2,color = "black") +
     geom_point(data = sites_pristine, size = 5, alpha = 0.8, aes(x=SiteLongitude, y= SiteLatitude, colour=Class))+
-      scale_colour_manual(values=group.colors,labels=c("Low biomass/productivity","High productivity","High biomass","Mid-range"))+
+      scale_colour_manual(values=group.colors,labels=c("Low biomass/turnover","High turnover","High biomass","Mid-range"))+
     coord_sf(expand = F,crs=4326)+
     theme_classic() +   theme(legend.title = element_text(size=40),
                               legend.text= element_text(size=40),
@@ -77,7 +77,7 @@ map_management <- function(data_prod,world){
   plot_partial = ggplot() +
     geom_sf(data = world, fill = "#171F28", size = 0.2,color = "black") +
     geom_point(data = sites_partial, size = 5, alpha = 0.8, aes(x=SiteLongitude, y= SiteLatitude, colour=Class))+
-    scale_colour_manual(values=group.colors,labels=c("Low biomass/productivity","High productivity","High biomass","Mid-range"))+
+    scale_colour_manual(values=group.colors,labels=c("Low biomass/turnover","High turnover","High biomass","Mid-range"))+
     coord_map("rectangular", lat0=0, xlim=c(-180,180), ylim=c(-60, 90))+
     coord_sf(expand = F,crs=4326)+
     theme_classic() +   theme(legend.title = element_text(size=40),
@@ -96,7 +96,7 @@ map_management <- function(data_prod,world){
   plot_deadzone = ggplot() +
     geom_sf(data = world, fill = "#171F28", size = 0.2,color = "black") +
     geom_point(data = sites_deadzone, size = 5, alpha = 0.8, aes(x=SiteLongitude, y= SiteLatitude, colour=Class))+
-    scale_colour_manual(values=group.colors,labels=c("Low biomass/productivity","High productivity","High biomass","Mid-range"))+
+    scale_colour_manual(values=group.colors,labels=c("Low biomass/turnover","High turnover","High biomass","Mid-range"))+
       coord_sf(expand = F,crs=4326)+
       theme_classic() +   theme(legend.title = element_text(size=40),
                                 legend.text= element_text(size=40),
@@ -115,7 +115,7 @@ map_management <- function(data_prod,world){
   plot_transition = ggplot() +
     geom_sf(data = world, fill = "#171F28", size = 0.2,color = "black") +
     geom_point(data = sites_transition, size = 5, alpha = 0.8, aes(x=SiteLongitude, y= SiteLatitude, colour=Class))+
-    scale_colour_manual(values=group.colors,labels=c("Low biomass/productivity","High productivity","High biomass","Mid-range"))+
+    scale_colour_manual(values=group.colors,labels=c("Low biomass/turnover","High turnover","High biomass","Mid-range"))+
     coord_sf(expand = F,crs=4326)+
     theme_classic() +   theme(legend.title = element_text(size=40),
                               legend.text= element_text(size=40),

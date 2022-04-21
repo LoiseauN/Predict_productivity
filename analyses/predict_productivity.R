@@ -8,6 +8,7 @@ predict_productivity = function(){
 print("Calculating productivity for all fish")
 RLS_prod_all = calc_prod_rfishprod(data_final)
 
+
 #Sensitivtiy to account for variability between transects
 RLS_prod_sensitivity = RLS_prod_all %>% filter(Size < quantile(Size, 0.95)) %>% filter(Num < quantile(Num, 0.95))
 
@@ -18,8 +19,8 @@ RLS_prod = calc_prod_transect(RLS_prod_all,info)
 RLS_prod_sensitivty = calc_prod_transect(RLS_prod_sensitivity, info)
 
 #Removing outliers, Biomass and productivity values superior to 99% of values
-RLS_prod = RLS_prod %>% filter(Biom < quantile(RLS_prod$Biom,0.95)) %>% filter(Productivity < quantile(RLS_prod$Productivity,0.95))
-RLS_prod_sensitivty = RLS_prod_sensitivty %>% filter(Biom < quantile(RLS_prod$Biom,0.95)) %>% filter(Productivity < quantile(RLS_prod$Productivity,0.95))
+RLS_prod = RLS_prod %>% filter(Biom < quantile(RLS_prod$Biom,0.99)) %>% filter(Productivity < quantile(RLS_prod$Productivity,0.99))
+RLS_prod_sensitivty = RLS_prod_sensitivty %>% filter(Biom < quantile(RLS_prod$Biom,0.99)) %>% filter(Productivity < quantile(RLS_prod$Productivity,0.99))
 save(RLS_prod, file = "outputs/RLS_prod.Rdata")
 
 RLS_info = read.table("data/RLS_transect_info.txt") %>%
@@ -29,16 +30,15 @@ summary(RLS_prod)
 range(RLS_prod$Productivity)
 
 #Prepping covariates
-RLS_Covariates_transect = data_covariates(RLS_prod,env,socio,mpa)
+RLS_Covariates_transect = data_covariates(RLS_prod,env_data = env,socio_data = socio,mpa_data = mpa)
 RLS_Covariates_transect_sensitivity = data_covariates(RLS_prod_sensitivty,env,socio,mpa)
 save(RLS_Covariates_transect,file="outputs/RLS_Covariates_transect.Rdata")
 
 print(paste("Number of transects:",length(unique(RLS_Covariates_transect$SurveyID))))
-RLS_Covariates = RLS_Covariates_transect %>% distinct(site_code, .keep_all = T) %>% dplyr::select(-c( Voice, ControlofCorruption, NoViolence))
-RLS_Covariates_sensitivity = RLS_Covariates_transect_sensitivity %>% distinct(site_code, .keep_all = T)%>% dplyr::select(-c( Voice, ControlofCorruption, NoViolence))
+RLS_Covariates = RLS_Covariates_transect %>% distinct(site_code, .keep_all = T) %>% dplyr::select(-c( Voice, ControlofCorruption, NoViolence,SurveyID))
+RLS_Covariates_sensitivity = RLS_Covariates_transect_sensitivity %>% distinct(site_code, .keep_all = T)%>% dplyr::select(-c( Voice, ControlofCorruption, NoViolence,SurveyID))
 
 # quantile(RLS_Covariates$Biom, 0.95)
-
 save(RLS_Covariates,file="outputs/RLS_Covariates.Rdata")
 
 # #TEMPORARY CODE NOT YET AS FUNCTION TO CREATE CLUSTERS
@@ -66,6 +66,13 @@ save(RLS_Covariates,file="outputs/RLS_Covariates.Rdata")
 #   dplyr::select(-c(log10ProdB,log10Biom))
 # 
 # RLS_Management = cbind(RLS_Covariates, RLS_Management)
+
+range(RLS_Management$Productivity)
+range(RLS_Management$Biom)
+range(RLS_Management$Prod)
+
+
+
 
 # #Protection classes
 RLS_Management = data_management(RLS_Covariates,0.95,0.25,0.75,0.25)
