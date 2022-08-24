@@ -37,7 +37,7 @@ model_prob = function(prod_data,modeloutput){
   var_imp$var_names = fct_reorder(var_imp$var_names, var_imp$percentage)
   
   var_imp = var_imp %>% column_to_rownames('rowname')
-  
+  i=2
   
   var_probs = pbmclapply(rownames(var_imp),function(i){
     
@@ -54,7 +54,7 @@ model_prob = function(prod_data,modeloutput){
       filter(Class=="pristine")%>%
       ggplot(aes(eval(parse(text = paste(i))),yhat)) +
       geom_point(colour="#C1DB60",size=3,alpha=0.7)+
-      geom_smooth(se=F)+
+      stat_smooth(method = "lm", formula = y ~ poly(x, 2), size = 1)
       theme_bw()+
       labs(x= var_imp[i,3],
            y="")+

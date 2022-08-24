@@ -1,6 +1,6 @@
 #-----------------Loading packages-------------------
 
-pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot","rfishbase","beepr","stars","factoextra", "magrittr","ggnewscale","pbmcapply",
+pkgs <- c("tidyverse","here","lme4","broom","tidymodels","parallel","nlme","cowplot","rfishbase","beepr","stars","factoextra", "magrittr","ggnewscale","pbmcapply","ggthemes",
           "rnaturalearth","plotly","ggridges","ggbeeswarm","ggforce","rfishbase","parameters","NbClust","cluster","klaR","beepr","gstat","ggspatial","maps","maptools","grid",
           "harrypotter","wesanderson","dichromat","ranger","ggpubr","data.table","pdp","png","sf","broom.mixed","arm","performance","see")
 nip <- pkgs[!(pkgs %in% installed.packages())]
@@ -27,7 +27,6 @@ files <- list.files(here::here("outputs"),pattern = ".Rdata|RData")
 data_list = lapply(files, load, .GlobalEnv)
 
 #-----------------Loading all functions---------------------
-
 path = (here::here("R"))
 setwd(path)
 files.source = list.files(here::here("R"))
@@ -46,9 +45,6 @@ files.source = list.files(here::here("analyses"))
 sapply(files.source, source)
 
 setwd(here())
-
-#Testing growth rate models and predicting them on RLS data base
-predict_growth()
 
 #Calculating productivity on RLS database, selecting transects with covariates, creating management classes and modelling them
 predict_productivity()

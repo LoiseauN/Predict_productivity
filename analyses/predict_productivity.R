@@ -3,11 +3,14 @@
 #' 
 
 predict_productivity = function(){
+  
+#Prepping RLS Data
+print("Preparing RLS Data..")
+data_final = RLS_data_prep(fish,traits,coef,env)
 
 #Calculating productivity
 print("Calculating productivity for all fish")
 RLS_prod_all = calc_prod_rfishprod(data_final)
-
 
 #Sensitivtiy to account for variability between transects
 RLS_prod_sensitivity = RLS_prod_all %>% filter(Size < quantile(Size, 0.95)) %>% filter(Num < quantile(Num, 0.95))
@@ -16,6 +19,9 @@ save(RLS_prod_all, file = "outputs/RLS_prod_all.Rdata")
 
 print("Aggregating at transect level and prepping management classes and covariates")
 RLS_prod = calc_prod_transect(RLS_prod_all,info)
+
+save(RLS_prod,file = "outputs/RLS_prod.Rdata")
+
 RLS_prod_sensitivty = calc_prod_transect(RLS_prod_sensitivity, info)
 
 #Removing outliers, Biomass and productivity values superior to 99% of values
@@ -70,8 +76,6 @@ save(RLS_Covariates,file="outputs/RLS_Covariates.Rdata")
 range(RLS_Management$Productivity)
 range(RLS_Management$Biom)
 range(RLS_Management$Prod)
-
-
 
 
 # #Protection classes
