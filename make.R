@@ -44,6 +44,7 @@ setwd(path)
 files.source = list.files(here::here("analyses"))
 sapply(files.source, source)
 
+#Setting root path
 setwd(here())
 
 #Calculating productivity on RLS database, selecting transects with covariates, creating management classes and modelling them
